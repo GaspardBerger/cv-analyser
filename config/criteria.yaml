@@ -1,0 +1,106 @@
+versie: "1.0"
+context:
+  doelgroep: "Jongeren op zoek naar werk in Brussel (Belgische/Europese markt)"
+  taal_hint: "CV kan in NL, FR of EN zijn — analyseer in de taal van het CV maar geef analyse in het Nederlands"
+  markt: "Belgische arbeidsmarkt, Brusselse regio"
+
+categorieen:
+  structuur_opmaak:
+    naam: "Structuur & Opmaak"
+    gewicht: 25
+    criteria:
+      - id: contactgegevens
+        beschrijving: "Volledige contactgegevens aanwezig (naam, e-mail, telefoonnummer)"
+        verplicht: true
+        gewicht: 6
+      - id: sectie_indeling
+        beschrijving: "Duidelijke sectie-indeling met koppen (Opleiding, Ervaring, Vaardigheden…)"
+        verplicht: true
+        gewicht: 5
+      - id: lengte
+        beschrijving: "Juiste lengte: 1 pagina voor starters, maximaal 2 pagina's voor meer ervaring"
+        verplicht: true
+        gewicht: 5
+      - id: leesbaarheid
+        beschrijving: "Leesbaar lettertype, voldoende witruimte, overzichtelijke lay-out"
+        verplicht: true
+        gewicht: 5
+      - id: foto
+        beschrijving: "Professionele foto aanwezig (gebruikelijk en aanbevolen in België)"
+        verplicht: false
+        gewicht: 2
+      - id: linkedin
+        beschrijving: "LinkedIn-profiel of persoonlijke website vermeld"
+        verplicht: false
+        gewicht: 2
+
+  inhoud:
+    naam: "Inhoud"
+    gewicht: 35
+    criteria:
+      - id: samenvatting
+        beschrijving: "Korte professionele samenvatting of doelstelling bovenaan het CV"
+        verplicht: true
+        gewicht: 5
+      - id: opleiding
+        beschrijving: "Opleiding volledig vermeld: instelling, richting, jaar van afstuderen"
+        verplicht: true
+        gewicht: 6
+      - id: werkervaring
+        beschrijving: "Werkervaring beschreven inclusief stages, studentenjobs en vakantiewerk"
+        verplicht: false
+        gewicht: 6
+      - id: vrijwilligerswerk
+        beschrijving: "Vrijwilligerswerk, verenigingsleven of extracurriculaire activiteiten vermeld"
+        verplicht: false
+        gewicht: 4
+      - id: vaardigheden
+        beschrijving: "Technische vaardigheden en relevante software/IT-kennis opgenomen"
+        verplicht: true
+        gewicht: 5
+      - id: talen
+        beschrijving: "Talenkennis vermeld met CEFR-niveau (A1–C2) of equivalent omschrijving"
+        verplicht: true
+        gewicht: 6
+      - id: relevantie
+        beschrijving: "Inhoud is relevant en gericht op de Belgische arbeidsmarkt"
+        verplicht: true
+        gewicht: 3
+
+  taal_schrijfstijl:
+    naam: "Taal & Schrijfstijl"
+    gewicht: 25
+    criteria:
+      - id: spelling
+        beschrijving: "Geen spelfouten of grammaticafouten zichtbaar in het CV"
+        verplicht: true
+        gewicht: 8
+      - id: actieve_werkwoorden
+        beschrijving: "Actieve werkwoorden gebruikt bij het beschrijven van taken (ontwikkeld, georganiseerd, bereikt…)"
+        verplicht: false
+        gewicht: 5
+      - id: meetbare_prestaties
+        beschrijving: "Concrete en meetbare prestaties opgenomen (cijfers, percentages, aantallen)"
+        verplicht: false
+        gewicht: 6
+      - id: professioneel_taalgebruik
+        beschrijving: "Consistent en professioneel taalgebruik doorheen het volledige document"
+        verplicht: true
+        gewicht: 6
+
+  professionaliteit:
+    naam: "Professionaliteit"
+    gewicht: 15
+    criteria:
+      - id: professioneel_email
+        beschrijving: "Professioneel e-mailadres (geen bijnamen, geboortejaren of willekeurige cijfers)"
+        verplicht: true
+        gewicht: 5
+      - id: geen_prive_info
+        beschrijving: "Geen onnodige privé-informatie (rijksregisternummer, religie, politieke voorkeur)"
+        verplicht: true
+        gewicht: 5
+      - id: consistentie
+        beschrijving: "Consistente datumnotatie en opmaakstijl doorheen het volledige CV"
+        verplicht: true
+        gewicht: 5
