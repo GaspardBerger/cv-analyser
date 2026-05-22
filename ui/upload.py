@@ -3,6 +3,8 @@
 
 import streamlit as st
 
+from translations import t
+
 TOEGESTANE_TYPES = ["pdf", "docx"]
 MAX_GROOTTE_MB = 10
 
@@ -12,14 +14,14 @@ def toon_upload_widget() -> object | None:
     Toon de bestandsupload-widget en valideer het geüploade bestand.
     Geeft het UploadedFile-object terug, of None als er niets geldig is geüpload.
     """
-    st.markdown("### Jouw CV uploaden")
-    st.caption("Ondersteunde formaten: PDF en Word (.docx) — maximaal 10 MB")
+    st.markdown(t("upload_header"))
+    st.caption(t("upload_caption"))
 
     bestand = st.file_uploader(
-        label="Kies je CV",
+        label=t("upload_label"),
         type=TOEGESTANE_TYPES,
         label_visibility="collapsed",
-        help="Sleep je CV hierheen of klik om een bestand te kiezen.",
+        help=t("upload_help"),
     )
 
     if bestand is None:
@@ -28,20 +30,14 @@ def toon_upload_widget() -> object | None:
     # Grootte controleren
     grootte_mb = len(bestand.getbuffer()) / (1024 * 1024)
     if grootte_mb > MAX_GROOTTE_MB:
-        st.error(
-            f"Het bestand is te groot ({grootte_mb:.1f} MB). "
-            f"Maximale bestandsgrootte is {MAX_GROOTTE_MB} MB."
-        )
+        st.error(t("upload_error_size", size=grootte_mb, max=MAX_GROOTTE_MB))
         return None
 
     naam = bestand.name
     extensie = naam.rsplit(".", 1)[-1].lower() if "." in naam else ""
     if extensie not in TOEGESTANE_TYPES:
-        st.error(
-            f"Bestandstype '.{extensie}' wordt niet ondersteund. "
-            "Upload een PDF- of Word-bestand (.docx)."
-        )
+        st.error(t("upload_error_type", ext=extensie))
         return None
 
-    st.success(f"Bestand geladen: **{naam}** ({grootte_mb:.2f} MB)")
+    st.success(t("upload_success", name=naam, size=grootte_mb))
     return bestand

@@ -11,12 +11,19 @@ import yaml
 
 CRITERIA_PAD = Path(__file__).parent.parent / "config" / "criteria.yaml"
 
+# Internal English keys used in JSON output and UI color mapping
 SCORE_LABELS = {
-    (0, 40): "Vereist veel werk",
-    (41, 59): "Voldoende",
-    (60, 74): "Goed",
-    (75, 89): "Zeer goed",
-    (90, 100): "Uitstekend",
+    (0, 40): "needs_work",
+    (41, 59): "sufficient",
+    (60, 74): "good",
+    (75, 89): "very_good",
+    (90, 100): "excellent",
+}
+
+_LANG_INSTRUCTIONS = {
+    "nl": "geef de analyse in het Nederlands",
+    "fr": "donne l'analyse en français",
+    "en": "give the analysis in English",
 }
 
 
@@ -24,7 +31,7 @@ def _score_label(score: int) -> str:
     for (laag, hoog), label in SCORE_LABELS.items():
         if laag <= score <= hoog:
             return label
-    return "Onbekend"
+    return "unknown"
 
 
 def laad_criteria(criteria_override: dict | None = None) -> dict:
@@ -48,17 +55,17 @@ def _bouw_criteria_tekst(criteria_data: dict) -> str:
     return "\n".join(regels)
 
 
-def _bouw_system_prompt(criteria_data: dict) -> str:
+def _bouw_system_prompt(criteria_data: dict, lang: str = "nl") -> str:
     criteria_tekst = _bouw_criteria_tekst(criteria_data)
     context = criteria_data.get("context", {})
     doelgroep = context.get("doelgroep", "jongeren op de arbeidsmarkt")
-    taal_hint = context.get("taal_hint", "analyseer in de taal van het CV maar geef analyse in het Nederlands")
+    taal_instructie = _LANG_INSTRUCTIONS.get(lang, _LANG_INSTRUCTIONS["nl"])
 
     return f"""Je bent een CV-expert voor de Belgische arbeidsmarkt, gespecialiseerd in het helpen van {doelgroep} bij het verbeteren van hun CV.
 
 Je analyseert CV's aan de hand van specifieke criteria en geeft een score van 0–100 plus maximaal 5 concrete, bemoedigende verbeterpunten.
 
-TAALINSTRUCTIE: {taal_hint}
+TAALINSTRUCTIE: Het CV kan in NL, FR of EN zijn. {taal_instructie}.
 
 CRITERIA VOOR BEOORDELING:
 {criteria_tekst}
@@ -71,37 +78,35 @@ BEOORDELINGSWIJZE:
 - Gebruik een bemoedigende en constructieve toon, geschikt voor jongeren die de arbeidsmarkt betreden
 - Noem ook 2–3 sterke punten om de deelnemer te motiveren
 
-VERPLICHT OUTPUT FORMAT — geef ENKEL dit JSON-object terug, zonder markdown, zonder uitleg erbuiten:
+VERPLICHT OUTPUT FORMAT — geef ENKEL dit JSON-object terug, zonder markdown, zonder uitleg erbuiten.
+Gebruik voor score_label en label ALTIJD een van deze vaste Engelse sleutels: needs_work, sufficient, good, very_good, excellent.
 {{
   "totaalscore": 72,
-  "score_label": "Goed",
+  "score_label": "good",
   "categorie_scores": {{
-    "structuur_opmaak": {{"score": 18, "max": 25, "label": "Goed"}},
-    "inhoud": {{"score": 25, "max": 35, "label": "Uitstekend"}},
-    "taal_schrijfstijl": {{"score": 20, "max": 25, "label": "Goed"}},
-    "professionaliteit": {{"score": 9, "max": 15, "label": "Voldoende"}}
+    "structuur_opmaak": {{"score": 18, "max": 25, "label": "good"}},
+    "inhoud": {{"score": 25, "max": 35, "label": "excellent"}},
+    "taal_schrijfstijl": {{"score": 20, "max": 25, "label": "good"}},
+    "professionaliteit": {{"score": 9, "max": 15, "label": "sufficient"}}
   }},
   "verbeterpunten": [
     {{
       "prioriteit": 1,
       "categorie": "taal_schrijfstijl",
-      "titel": "Voeg meetbare prestaties toe",
-      "probleem": "De werkervaring beschrijft taken maar geen resultaten.",
-      "waarom": "Werkgevers willen zien wat je hebt bereikt, niet alleen wat je deed.",
-      "voorbeeld": "In plaats van 'klantenservice gedaan', schrijf: '30+ klanten per dag geholpen, klanttevredenheid verhoogd met 15%%'.",
+      "titel": "...",
+      "probleem": "...",
+      "waarom": "...",
+      "voorbeeld": "...",
       "criterium_id": "meetbare_prestaties"
     }}
   ],
-  "sterke_punten": [
-    "Duidelijke contactgegevens met LinkedIn-profiel",
-    "Goede talenkennis met CEFR-niveaus vermeld"
-  ],
+  "sterke_punten": ["...", "..."],
   "taal_cv": "nl",
-  "samenvatting": "Dit CV toont een solide basis. Met enkele gerichte aanpassingen wordt het aanzienlijk sterker."
+  "samenvatting": "..."
 }}"""
 
 
-def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None) -> dict:
+def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None, lang: str = "nl") -> dict:
     """
     Analyseer een CV-tekst via de Claude API.
 
@@ -121,7 +126,7 @@ def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None) -> dict:
         )
 
     criteria_data = laad_criteria(criteria_override)
-    system_prompt = _bouw_system_prompt(criteria_data)
+    system_prompt = _bouw_system_prompt(criteria_data, lang=lang)
 
     client = anthropic.Anthropic(api_key=api_sleutel)
 

@@ -23,13 +23,14 @@ sys.path.insert(0, os.path.dirname(__file__))
 from core.analyzer import analyseer_cv
 from core.extractor import extraheer_tekst
 from core.privacy import tijdelijk_bestand
+from translations import LANGUAGE_OPTIONS, t
 from ui.criteria_editor import toon_criteria_editor
 from ui.results import toon_resultaten
 from ui.upload import toon_upload_widget
 
 
 st.set_page_config(
-    page_title="CV-Analysator — Gluon Educatie",
+    page_title="CV Analyser — Gluon Educatie",
     page_icon="📄",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -40,33 +41,39 @@ if "analyse_resultaat" not in st.session_state:
     st.session_state.analyse_resultaat = None
 if "criteria_override" not in st.session_state:
     st.session_state.criteria_override = None
+if "lang" not in st.session_state:
+    st.session_state["lang"] = "nl"
+
+# Language selector (small, top right)
+_lang_options = list(LANGUAGE_OPTIONS.keys())
+_lang_reverse = {v: k for k, v in LANGUAGE_OPTIONS.items()}
+_, _lang_col = st.columns([5, 1])
+with _lang_col:
+    _selected = st.selectbox(
+        "Language",
+        options=_lang_options,
+        index=_lang_options.index(_lang_reverse.get(st.session_state["lang"], "Nederlands")),
+        label_visibility="collapsed",
+    )
+st.session_state["lang"] = LANGUAGE_OPTIONS[_selected]
 
 
 def _controleer_api_sleutel() -> bool:
     sleutel = os.environ.get("ANTHROPIC_API_KEY", "")
     if not sleutel or not sleutel.startswith("sk-"):
-        st.error(
-            "**API-sleutel niet gevonden.**\n\n"
-            "Maak een bestand aan genaamd `.env` in de map `cv-analysator/` "
-            "met de volgende inhoud:\n\n```\nANTHROPIC_API_KEY=jouw-sleutel-hier\n```\n\n"
-            "Herstart daarna de applicatie."
-        )
+        st.error(t("api_key_error"))
         return False
     return True
 
 
 def _nieuwe_analyse():
-    """Verwijder het vorige resultaat zodat de gebruiker opnieuw kan starten."""
     st.session_state.analyse_resultaat = None
     st.rerun()
 
 
 # Header
-st.markdown("# CV-Analysator")
-st.markdown(
-    "Ontdek hoe sterk jouw CV is en wat je kunt verbeteren. "
-    "Upload je CV hieronder — je gegevens worden **niet bewaard** na de analyse."
-)
+st.markdown(f"# {t('app_header')}")
+st.markdown(t("app_subtitle"))
 st.divider()
 
 # API-sleutel controleren
@@ -77,7 +84,7 @@ if not _controleer_api_sleutel():
 if st.session_state.analyse_resultaat is not None:
     toon_resultaten(st.session_state.analyse_resultaat)
     st.divider()
-    if st.button("Nieuw CV analyseren", type="secondary"):
+    if st.button(t("btn_new_analysis"), type="secondary"):
         _nieuwe_analyse()
     st.stop()
 
@@ -90,10 +97,10 @@ criteria_override = toon_criteria_editor()
 # Analyseknop
 if bestand is not None:
     st.divider()
-    if st.button("CV analyseren", type="primary", use_container_width=True):
+    if st.button(t("btn_analyse"), type="primary", use_container_width=True):
         extensie = "." + bestand.name.rsplit(".", 1)[-1].lower()
 
-        with st.spinner("Je CV wordt geanalyseerd…"):
+        with st.spinner(t("spinner")):
             # Stap 1: tekst extraheren (tijdelijk bestand, direct verwijderd)
             with tijdelijk_bestand(bestand, extensie) as pad:
                 tekst, waarschuwing = extraheer_tekst(pad)
@@ -103,24 +110,25 @@ if bestand is not None:
                 st.stop()
 
             if not tekst:
-                st.error("Er kon geen tekst worden uitgelezen uit het bestand.")
+                st.error(t("error_no_text"))
                 st.stop()
 
             # Stap 2: analyse via Claude API
             try:
-                resultaat = analyseer_cv(tekst, criteria_override=criteria_override)
+                resultaat = analyseer_cv(
+                    tekst,
+                    criteria_override=criteria_override,
+                    lang=st.session_state["lang"],
+                )
             except RuntimeError as fout:
                 st.error(str(fout))
                 st.stop()
             except Exception as fout:
                 fout_str = str(fout).lower()
                 if "connection" in fout_str or "network" in fout_str or "timeout" in fout_str:
-                    st.error(
-                        "Geen verbinding met de analyseservice. "
-                        "Controleer je internetverbinding en probeer het opnieuw."
-                    )
+                    st.error(t("error_no_connection"))
                 else:
-                    st.error(f"Er is een onverwachte fout opgetreden: {fout}")
+                    st.error(t("error_unexpected", error=fout))
                 st.stop()
 
         st.session_state.analyse_resultaat = resultaat
@@ -128,4 +136,4 @@ if bestand is not None:
 
 # Voettekst
 st.divider()
-st.caption("Gluon Educatie — CV-Analysator v1.0 | Gegevens worden niet opgeslagen")
+st.caption(t("footer"))

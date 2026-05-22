@@ -7,6 +7,7 @@ import streamlit as st
 import yaml
 
 from core.analyzer import laad_criteria, CRITERIA_PAD
+from translations import t
 
 
 def toon_criteria_editor() -> dict | None:
@@ -15,13 +16,10 @@ def toon_criteria_editor() -> dict | None:
     Wijzigingen gelden alleen voor de huidige sessie en worden niet opgeslagen.
     Geeft de aangepaste criteria terug als dict, of None als de standaard criteria gebruikt worden.
     """
-    with st.expander("Criteria aanpassen (voor begeleiders)", expanded=False):
-        st.caption(
-            "Hier kun je criteria aan- of uitzetten en beschrijvingen aanpassen voor deze sessie. "
-            "Wijzigingen worden **niet** opgeslagen en verdwijnen wanneer de pagina wordt vernieuwd."
-        )
+    with st.expander(t("criteria_expander"), expanded=False):
+        st.caption(t("criteria_caption"))
 
-        if st.button("Standaard criteria herstellen", key="reset_criteria"):
+        if st.button(t("criteria_reset"), key="reset_criteria"):
             if "criteria_override" in st.session_state:
                 del st.session_state["criteria_override"]
             st.rerun()
@@ -35,7 +33,7 @@ def toon_criteria_editor() -> dict | None:
         categorieen = criteria_werk.get("categorieen", {})
 
         for cat_id, cat in categorieen.items():
-            st.markdown(f"**{cat['naam']}** (huidig gewicht: {cat['gewicht']}%)")
+            st.markdown(f"**{cat['naam']}** ({t('criteria_weight', weight=cat['gewicht'])})")
 
             nieuw_gewicht = st.slider(
                 f"Gewicht {cat['naam']}",
@@ -80,10 +78,10 @@ def toon_criteria_editor() -> dict | None:
             st.markdown("---")
 
         # Context-instellingen
-        st.markdown("**Contextuele instellingen**")
+        st.markdown(t("criteria_context_header"))
         context = criteria_werk.get("context", {})
         nieuwe_doelgroep = st.text_input(
-            "Doelgroep",
+            t("criteria_doelgroep"),
             value=context.get("doelgroep", ""),
             key="context_doelgroep",
         )
@@ -93,14 +91,12 @@ def toon_criteria_editor() -> dict | None:
 
         if gewijzigd:
             st.session_state["criteria_override"] = criteria_werk
-            st.info("Aangepaste criteria zijn actief voor deze sessie.")
+            st.info(t("criteria_active_info"))
             return criteria_werk
 
         # Toon ook YAML-exportoptie voor permanente opslag
-        with st.expander("Huidige criteria bekijken (YAML)", expanded=False):
+        with st.expander(t("criteria_yaml_expander"), expanded=False):
             st.code(yaml.dump(standaard, allow_unicode=True, default_flow_style=False), language="yaml")
-            st.caption(
-                f"Wil je criteria permanent opslaan? Pas het bestand aan: `{CRITERIA_PAD}`"
-            )
+            st.caption(t("criteria_yaml_caption", path=CRITERIA_PAD))
 
     return st.session_state.get("criteria_override")

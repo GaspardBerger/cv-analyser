@@ -3,32 +3,27 @@
 
 import streamlit as st
 
+from translations import t
+
+# Internal English score keys → hex color
 SCORE_KLEUREN = {
-    "Vereist veel werk": "#e74c3c",
-    "Voldoende": "#e67e22",
-    "Goed": "#f1c40f",
-    "Zeer goed": "#2ecc71",
-    "Uitstekend": "#27ae60",
+    "needs_work": "#e74c3c",
+    "sufficient": "#e67e22",
+    "good": "#f1c40f",
+    "very_good": "#2ecc71",
+    "excellent": "#27ae60",
 }
-
-CATEGORIE_NAMEN = {
-    "structuur_opmaak": "Structuur & Opmaak",
-    "inhoud": "Inhoud",
-    "taal_schrijfstijl": "Taal & Schrijfstijl",
-    "professionaliteit": "Professionaliteit",
-}
-
-PRIORITEIT_LABELS = {1: "Hoogste prioriteit", 2: "Hoge prioriteit", 3: "Gemiddelde prioriteit", 4: "Lage prioriteit", 5: "Lage prioriteit"}
 
 
 def toon_resultaten(resultaat: dict) -> None:
     """Toon de volledige analyseresultaten op het scherm."""
     score = resultaat.get("totaalscore", 0)
-    label = resultaat.get("score_label", "")
-    kleur = SCORE_KLEUREN.get(label, "#95a5a6")
+    score_key = resultaat.get("score_label", "")
+    label = t(f"score_{score_key}") if score_key else ""
+    kleur = SCORE_KLEUREN.get(score_key, "#95a5a6")
 
     st.divider()
-    st.markdown("## Resultaten van je CV-analyse")
+    st.markdown(t("results_header"))
 
     # Totaalscore
     col1, col2 = st.columns([1, 2])
@@ -53,20 +48,21 @@ def toon_resultaten(resultaat: dict) -> None:
     with col2:
         samenvatting = resultaat.get("samenvatting", "")
         if samenvatting:
-            st.markdown(f"**Samenvatting**\n\n{samenvatting}")
+            st.markdown(f"{t('results_summary')}\n\n{samenvatting}")
 
     # Categoriescores
-    st.markdown("### Score per categorie")
+    st.markdown(t("results_cat_scores"))
     categorie_scores = resultaat.get("categorie_scores", {})
     kolommen = st.columns(len(categorie_scores))
 
     for (cat_id, cat_data), col in zip(categorie_scores.items(), kolommen):
         cat_score = cat_data.get("score", 0)
         cat_max = cat_data.get("max", 0)
-        cat_label = cat_data.get("label", "")
-        cat_naam = CATEGORIE_NAMEN.get(cat_id, cat_id)
+        cat_score_key = cat_data.get("label", "")
+        cat_label = t(f"score_{cat_score_key}") if cat_score_key else ""
+        cat_naam = t(f"cat_{cat_id}")
         percentage = int((cat_score / cat_max * 100)) if cat_max else 0
-        cat_kleur = SCORE_KLEUREN.get(cat_label, "#95a5a6")
+        cat_kleur = SCORE_KLEUREN.get(cat_score_key, "#95a5a6")
 
         with col:
             st.markdown(
@@ -90,15 +86,17 @@ def toon_resultaten(resultaat: dict) -> None:
     # Sterke punten
     sterke_punten = resultaat.get("sterke_punten", [])
     if sterke_punten:
-        st.markdown("### Wat je al goed doet")
+        st.markdown(t("results_strengths"))
         for punt in sterke_punten:
             st.success(f"✓ {punt}")
 
     # Verbeterpunten
     verbeterpunten = resultaat.get("verbeterpunten", [])
     if verbeterpunten:
-        st.markdown("### Hoe je je CV kunt verbeteren")
-        st.caption(f"{len(verbeterpunten)} verbeterpunt{'en' if len(verbeterpunten) > 1 else ''}, van meest naar minst impactvol")
+        st.markdown(t("results_improvements"))
+        n = len(verbeterpunten)
+        plural = t("results_improvements_plural") if n > 1 else ""
+        st.caption(t("results_improvements_caption", n=n, p=plural))
 
         for vp in verbeterpunten:
             prioriteit = vp.get("prioriteit", 1)
@@ -106,21 +104,21 @@ def toon_resultaten(resultaat: dict) -> None:
             probleem = vp.get("probleem", "")
             waarom = vp.get("waarom", "")
             voorbeeld = vp.get("voorbeeld", "")
-            cat = CATEGORIE_NAMEN.get(vp.get("categorie", ""), vp.get("categorie", ""))
-            prio_label = PRIORITEIT_LABELS.get(prioriteit, "")
+            cat = t(f"cat_{vp.get('categorie', '')}")
+            prio_label = t(f"prio_{prioriteit}")
 
             with st.expander(f"**{prioriteit}. {titel}** — {cat}", expanded=(prioriteit <= 2)):
                 if prio_label:
                     st.caption(prio_label)
                 if probleem:
-                    st.markdown(f"**Wat ontbreekt:** {probleem}")
+                    st.markdown(f"{t('results_what_missing')} {probleem}")
                 if waarom:
-                    st.markdown(f"**Waarom dit belangrijk is:** {waarom}")
+                    st.markdown(f"{t('results_why_important')} {waarom}")
                 if voorbeeld:
-                    st.info(f"**Concreet voorbeeld:** {voorbeeld}")
+                    st.info(f"{t('results_example')} {voorbeeld}")
 
     # Taalindicator
     taal = resultaat.get("taal_cv", "")
-    taal_namen = {"nl": "Nederlands", "fr": "Frans", "en": "Engels"}
     if taal:
-        st.caption(f"CV-taal gedetecteerd: {taal_namen.get(taal, taal.upper())}")
+        taal_naam = t(f"cv_lang_{taal}")
+        st.caption(t("results_cv_lang", lang=taal_naam))
