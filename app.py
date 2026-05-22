@@ -5,10 +5,13 @@ import os
 import sys
 
 import streamlit as st
-from dotenv import load_dotenv
 
-# Lokaal: laad .env bestand
-load_dotenv()
+# Lokaal: laad .env bestand (niet nodig op Streamlit Cloud)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # Streamlit Cloud: haal API-sleutel uit st.secrets en zet in os.environ
 try:
