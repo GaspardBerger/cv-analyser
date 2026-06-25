@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Tekstextractie uit PDF- en DOCX-bestanden voor CV-analyse."""
+"""Tekstextractie uit PDF- en DOCX-bestanden voor CV-analyse.
+
+Strategie voor PDF's:
+1. pdfplumber  — snel, werkt voor tekst-gebaseerde PDF's
+2. PyMuPDF     — tweede poging, beter bij sommige PDF-types
+3. Claude OCR  — fallback voor gescande/afbeelding-PDF's (via Vision API)
+"""
 
 from pathlib import Path
 
@@ -8,9 +14,10 @@ def extraheer_tekst(bestandspad: str) -> tuple[str, str | None]:
     """
     Extraheer leesbare tekst uit een PDF of DOCX bestand.
 
-    Geeft terug: (tekst, waarschuwing)
-    - tekst: geëxtraheerde CV-tekst (leeg bij mislukking)
-    - waarschuwing: melding als het bestand niet goed leesbaar is (anders None)
+    Geeft terug: (tekst, melding)
+    - tekst:    geëxtraheerde CV-tekst (leeg bij mislukking)
+    - melding:  None bij succes; foutmelding als tekst leeg is;
+                informatieve melding als OCR werd gebruikt (tekst is dan WEL gevuld)
     """
     pad = Path(bestandspad)
     suffix = pad.suffix.lower()
@@ -23,33 +30,144 @@ def extraheer_tekst(bestandspad: str) -> tuple[str, str | None]:
         return "", f"Bestandsformaat '{suffix}' wordt niet ondersteund. Gebruik PDF of DOCX."
 
 
+# ── PDF ──────────────────────────────────────────────────────────────────────
+
 def _extraheer_pdf(pad: str) -> tuple[str, str | None]:
+    # Stap 1: pdfplumber
+    tekst = _probeer_pdfplumber(pad)
+    if tekst:
+        return tekst, None
+
+    # Stap 2: PyMuPDF (soms beter voor hybride PDF's)
+    tekst = _probeer_pymupdf_tekst(pad)
+    if tekst:
+        return tekst, None
+
+    # Stap 3: OCR via Claude Vision (gescande PDF's)
+    return _ocr_via_claude_vision(pad)
+
+
+def _probeer_pdfplumber(pad: str) -> str:
     try:
         import pdfplumber
     except ImportError:
-        return "", "pdfplumber is niet geïnstalleerd. Voer 'pip install pdfplumber' uit."
-
-    tekst_delen = []
+        return ""
     try:
+        tekst_delen = []
         with pdfplumber.open(pad) as pdf:
             for pagina in pdf.pages:
                 inhoud = pagina.extract_text()
                 if inhoud:
                     tekst_delen.append(inhoud)
-    except Exception as fout:
-        return "", f"Kon de PDF niet lezen: {fout}"
+        tekst = "\n".join(tekst_delen).strip()
+        return tekst if len(tekst) >= 50 else ""
+    except Exception:
+        return ""
 
-    tekst = "\n".join(tekst_delen).strip()
+
+def _probeer_pymupdf_tekst(pad: str) -> str:
+    try:
+        import fitz  # PyMuPDF
+    except ImportError:
+        return ""
+    try:
+        doc = fitz.open(pad)
+        tekst_delen = []
+        for pagina in doc:
+            inhoud = pagina.get_text()
+            if inhoud and inhoud.strip():
+                tekst_delen.append(inhoud.strip())
+        tekst = "\n".join(tekst_delen).strip()
+        return tekst if len(tekst) >= 50 else ""
+    except Exception:
+        return ""
+
+
+def _ocr_via_claude_vision(pad: str) -> tuple[str, str | None]:
+    """Render PDF-pagina's als afbeeldingen en stuur ze naar Claude Vision voor OCR."""
+    import base64
+    import os
+
+    try:
+        import fitz  # PyMuPDF
+    except ImportError:
+        return "", (
+            "Dit lijkt een gescande PDF. Installeer PyMuPDF om gescande CV's te lezen: "
+            "'pip install PyMuPDF'."
+        )
+
+    try:
+        import anthropic
+    except ImportError:
+        return "", "anthropic is niet geïnstalleerd."
+
+    api_sleutel = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_sleutel:
+        return "", "API-sleutel niet beschikbaar voor OCR."
+
+    try:
+        doc = fitz.open(pad)
+    except Exception as e:
+        return "", f"Kon PDF niet openen: {e}"
+
+    # Een CV is maximaal 2–3 pagina's; we verwerken max. 5 pagina's
+    max_paginas = min(len(doc), 5)
+    client = anthropic.Anthropic(api_key=api_sleutel)
+    tekst_delen = []
+
+    for i in range(max_paginas):
+        pagina = doc[i]
+        # 150 DPI: goede kwaliteit zonder te grote bestanden
+        mat = fitz.Matrix(150 / 72, 150 / 72)
+        pix = pagina.get_pixmap(matrix=mat)
+        img_b64 = base64.standard_b64encode(pix.tobytes("png")).decode()
+
+        try:
+            bericht = client.messages.create(
+                model="claude-sonnet-4-6",
+                max_tokens=2000,
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/png",
+                                "data": img_b64,
+                            },
+                        },
+                        {
+                            "type": "text",
+                            "text": (
+                                "Extraheer alle tekst uit dit CV-beeld zo volledig en nauwkeurig mogelijk. "
+                                "Behoud de structuur (secties, koppen). "
+                                "Geef alleen de tekst terug, zonder commentaar of uitleg."
+                            ),
+                        },
+                    ],
+                }],
+            )
+            pagina_tekst = bericht.content[0].text.strip()
+            if pagina_tekst:
+                tekst_delen.append(pagina_tekst)
+        except Exception:
+            continue
+
+    tekst = "\n\n".join(tekst_delen).strip()
 
     if not tekst or len(tekst) < 50:
         return "", (
-            "Er kon geen tekst worden uitgelezen uit dit PDF-bestand. "
-            "Dit komt voor bij gescande of afbeelding-PDF's. "
-            "Exporteer je CV als PDF vanuit Word of een tekstverwerkingsprogramma."
+            "Er kon geen tekst worden uitgelezen uit dit document, ook niet via OCR. "
+            "Probeer het CV te exporteren als PDF vanuit Word of Google Docs."
         )
 
-    return tekst, None
+    # Tekst gevonden via OCR — informatie voor de gebruiker (niet-blokkerend)
+    ocr_melding = "ocr_gebruikt"
+    return tekst, ocr_melding
 
+
+# ── DOCX ─────────────────────────────────────────────────────────────────────
 
 def _extraheer_docx(pad: str) -> tuple[str, str | None]:
     try:

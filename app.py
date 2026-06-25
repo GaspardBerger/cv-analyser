@@ -46,6 +46,8 @@ if "criteria_override" not in st.session_state:
     st.session_state.criteria_override = None
 if "lang" not in st.session_state:
     st.session_state["lang"] = "nl"
+if "ocr_gebruikt" not in st.session_state:
+    st.session_state.ocr_gebruikt = False
 
 # Language selector (small, top right)
 _lang_options = list(LANGUAGE_OPTIONS.keys())
@@ -71,6 +73,7 @@ def _controleer_api_sleutel() -> bool:
 
 def _nieuwe_analyse():
     st.session_state.analyse_resultaat = None
+    st.session_state.ocr_gebruikt = False
     st.rerun()
 
 
@@ -85,6 +88,8 @@ if not _controleer_api_sleutel():
 
 # Toon resultaten als analyse al gedaan is
 if st.session_state.analyse_resultaat is not None:
+    if st.session_state.ocr_gebruikt:
+        st.info(t("ocr_info"))
     toon_resultaten(st.session_state.analyse_resultaat)
     st.divider()
     if st.button(t("btn_new_analysis"), type="secondary"):
@@ -106,15 +111,15 @@ if bestand is not None:
         with st.spinner(t("spinner")):
             # Stap 1: tekst extraheren (tijdelijk bestand, direct verwijderd)
             with tijdelijk_bestand(bestand, extensie) as pad:
-                tekst, waarschuwing = extraheer_tekst(pad)
-
-            if waarschuwing:
-                st.warning(waarschuwing)
-                st.stop()
+                tekst, melding = extraheer_tekst(pad)
 
             if not tekst:
-                st.error(t("error_no_text"))
+                # Blokkerende fout: geen tekst gevonden
+                st.warning(melding or t("error_no_text"))
                 st.stop()
+
+            # Niet-blokkerend: OCR werd gebruikt
+            ocr_gebruikt = (melding == "ocr_gebruikt")
 
             # Stap 2: analyse via Claude API
             try:
@@ -135,6 +140,7 @@ if bestand is not None:
                 st.stop()
 
         st.session_state.analyse_resultaat = resultaat
+        st.session_state.ocr_gebruikt = ocr_gebruikt
         st.rerun()
 
 # Voettekst

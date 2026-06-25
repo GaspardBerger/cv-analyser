@@ -27,6 +27,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "Er is een onverwachte fout opgetreden: {error}",
         "footer": "Gluon Educatie — CV-Analysator v1.0 | Gegevens worden niet opgeslagen",
+        "ocr_info": "Dit CV was een gescande PDF en kon niet rechtstreeks worden uitgelezen. De tekst werd herkend via AI (OCR) — de analyse is normaal bruikbaar, maar kan minder nauwkeurig zijn bij een onleesbare scan.",
         # upload
         "upload_header": "### Jouw CV uploaden",
         "upload_caption": "Ondersteunde formaten: PDF en Word (.docx) — maximaal 10 MB",
@@ -109,6 +110,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "Une erreur inattendue s'est produite : {error}",
         "footer": "Gluon Educatie — Analyseur de CV v1.0 | Les données ne sont pas conservées",
+        "ocr_info": "Ce CV était un PDF scanné et n'a pas pu être lu directement. Le texte a été reconnu par IA (OCR) — l'analyse est normalement exploitable, mais peut être moins précise si le scan est peu lisible.",
         # upload
         "upload_header": "### Télécharger votre CV",
         "upload_caption": "Formats acceptés : PDF et Word (.docx) — 10 Mo maximum",
@@ -191,6 +193,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "An unexpected error occurred: {error}",
         "footer": "Gluon Educatie — CV Analyser v1.0 | Data is not stored",
+        "ocr_info": "This CV was a scanned PDF and could not be read directly. The text was recognised using AI (OCR) — the analysis is normally usable, but may be less accurate if the scan quality is poor.",
         # upload
         "upload_header": "### Upload your CV",
         "upload_caption": "Supported formats: PDF and Word (.docx) — maximum 10 MB",
