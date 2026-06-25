@@ -35,6 +35,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "upload_error_size": "Het bestand is te groot ({size:.1f} MB). Maximale bestandsgrootte is {max} MB.",
         "upload_error_type": "Bestandstype '.{ext}' wordt niet ondersteund. Upload een PDF- of Word-bestand (.docx).",
         "upload_success": "Bestand geladen: **{name}** ({size:.2f} MB)",
+        "upload_filename_tip": "Tip voor de bestandsnaam: gebruik bij voorkeur **Cv_Voornaam Naam.pdf** (bijv. Cv_Jana Claes.pdf). Je kunt ook 'student' en de functie toevoegen: Cv_Jana Claes student Onthaal.pdf",
         # results
         "results_header": "## Resultaten van je CV-analyse",
         "results_summary": "**Samenvatting**",
@@ -116,6 +117,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "upload_error_size": "Le fichier est trop volumineux ({size:.1f} Mo). La taille maximale est de {max} Mo.",
         "upload_error_type": "Le type de fichier '.{ext}' n'est pas pris en charge. Téléchargez un fichier PDF ou Word (.docx).",
         "upload_success": "Fichier chargé : **{name}** ({size:.2f} Mo)",
+        "upload_filename_tip": "Conseil sur le nom du fichier : utilisez de préférence **Cv_Prénom Nom.pdf** (ex. Cv_Jana Claes.pdf). Vous pouvez aussi ajouter 'étudiant' et la fonction visée : Cv_Jana Claes étudiant Accueil.pdf",
         # results
         "results_header": "## Résultats de l'analyse de votre CV",
         "results_summary": "**Résumé**",
@@ -197,6 +199,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "upload_error_size": "The file is too large ({size:.1f} MB). Maximum file size is {max} MB.",
         "upload_error_type": "File type '.{ext}' is not supported. Upload a PDF or Word file (.docx).",
         "upload_success": "File loaded: **{name}** ({size:.2f} MB)",
+        "upload_filename_tip": "File name tip: preferably use **Cv_FirstName LastName.pdf** (e.g. Cv_Jana Claes.pdf). You can also add 'student' and the job function: Cv_Jana Claes student Reception.pdf",
         # results
         "results_header": "## Results of your CV analysis",
         "results_summary": "**Summary**",

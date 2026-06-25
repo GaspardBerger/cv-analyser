@@ -1,4 +1,4 @@
-versie: "1.0"
+versie: "1.1"
 context:
   doelgroep: "Jongeren op zoek naar werk in Brussel (Belgische/Europese markt)"
   taal_hint: "CV kan in NL, FR of EN zijn — analyseer in de taal van het CV maar geef analyse in het Nederlands"
@@ -26,7 +26,7 @@ categorieen:
         verplicht: true
         gewicht: 5
       - id: foto
-        beschrijving: "Professionele foto aanwezig (gebruikelijk en aanbevolen in België)"
+        beschrijving: "Professionele foto aanwezig (aanbevolen in België); let op: visuele analyse van foto's is niet mogelijk via tekstextractie — beoordeel enkel op basis van een tekstvermelding of beschrijving in het CV"
         verplicht: false
         gewicht: 2
       - id: linkedin
@@ -41,31 +41,35 @@ categorieen:
       - id: samenvatting
         beschrijving: "Korte professionele samenvatting of doelstelling bovenaan het CV"
         verplicht: true
-        gewicht: 5
+        gewicht: 4
       - id: opleiding
-        beschrijving: "Opleiding volledig vermeld: instelling, richting, jaar van afstuderen"
+        beschrijving: "Opleiding volledig vermeld (instelling, richting, jaar) in anti-chronologische volgorde (meest recent eerst); bij meerdere scholen of richtingen op korte tijd: enkel de huidige of meest recente studie benadrukken — te veel herscholingen roepen vragen op bij werkgevers"
         verplicht: true
         gewicht: 6
       - id: werkervaring
-        beschrijving: "Werkervaring beschreven inclusief stages, studentenjobs en vakantiewerk"
+        beschrijving: "Werkervaring in anti-chronologische volgorde (meest recent eerst), inclusief stages, studentenjobs en vakantiewerk"
         verplicht: false
-        gewicht: 6
+        gewicht: 5
       - id: vrijwilligerswerk
         beschrijving: "Vrijwilligerswerk, verenigingsleven of extracurriculaire activiteiten vermeld"
         verplicht: false
-        gewicht: 4
+        gewicht: 3
       - id: vaardigheden
         beschrijving: "Technische vaardigheden en relevante software/IT-kennis opgenomen"
         verplicht: true
         gewicht: 5
       - id: talen
-        beschrijving: "Talenkennis vermeld met CEFR-niveau (A1–C2) of equivalent omschrijving"
+        beschrijving: "Talenkennis vermeld; voor een Nederlandstalig cv in Brussel is de aanbevolen volgorde: NL, FR, EN en daarna overige talen (ook al is dit niet altijd de volgorde van best naar minst); CEFR-niveaus (A1–C2) zijn ideaal maar middelbare scholieren kennen deze schaal vaak niet — een equivalente omschrijving (basiskennis, gevorderd, moedertaal…) is ook aanvaardbaar"
         verplicht: true
-        gewicht: 6
+        gewicht: 5
       - id: relevantie
         beschrijving: "Inhoud is relevant en gericht op de Belgische arbeidsmarkt"
         verplicht: true
         gewicht: 3
+      - id: beschikbaarheid_geboortedatum
+        beschrijving: "Beschikbaarheid en geboortedatum aanwezig; werkgevers vermelden in vacatures vaak een minimumleeftijd of specifieke beschikbaarheid, dus deze gegevens zijn aanbevolen — in tegenstelling tot andere privégegevens"
+        verplicht: false
+        gewicht: 4
 
   taal_schrijfstijl:
     naam: "Taal & Schrijfstijl"
@@ -74,11 +78,11 @@ categorieen:
       - id: spelling
         beschrijving: "Geen spelfouten of grammaticafouten zichtbaar in het CV"
         verplicht: true
-        gewicht: 8
+        gewicht: 7
       - id: actieve_werkwoorden
         beschrijving: "Actieve werkwoorden gebruikt bij het beschrijven van taken (ontwikkeld, georganiseerd, bereikt…)"
         verplicht: false
-        gewicht: 5
+        gewicht: 4
       - id: meetbare_prestaties
         beschrijving: "Concrete en meetbare prestaties opgenomen (cijfers, percentages, aantallen)"
         verplicht: false
@@ -87,17 +91,21 @@ categorieen:
         beschrijving: "Consistent en professioneel taalgebruik doorheen het volledige document"
         verplicht: true
         gewicht: 6
+      - id: realistische_claims
+        beschrijving: "Geen onrealistische of overdreven uitspraken zoals 'perfecte kennis', 'beschikbaar wanneer u wil', absolute superlatieven of kwalificaties die niet geloofwaardig zijn voor een jongere starter"
+        verplicht: false
+        gewicht: 2
 
   professionaliteit:
     naam: "Professionaliteit"
     gewicht: 15
     criteria:
       - id: professioneel_email
-        beschrijving: "Professioneel e-mailadres (geen bijnamen, geboortejaren of willekeurige cijfers)"
+        beschrijving: "Professioneel e-mailadres bij voorkeur in de vorm voornaam.naam@ of voornaam_naam@ (geen bijnamen, geboortejaren of willekeurige cijfers)"
         verplicht: true
         gewicht: 5
       - id: geen_prive_info
-        beschrijving: "Geen onnodige privé-informatie (rijksregisternummer, religie, politieke voorkeur)"
+        beschrijving: "Geen onnodige privé-informatie (rijksregisternummer, religie, politieke voorkeur); geboortedatum en beschikbaarheid zijn echter WEL aanbevolen en mogen aanwezig zijn"
         verplicht: true
         gewicht: 5
       - id: consistentie

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Upload-widget: bestandsupload + validatie voor de CV-analysator."""
 
+import re
+
 import streamlit as st
 
 from translations import t
@@ -40,4 +42,10 @@ def toon_upload_widget() -> object | None:
         return None
 
     st.success(t("upload_success", name=naam, size=grootte_mb))
+
+    # Bestandsnaam controleren op aanbevolen formaat: Cv_Voornaam Naam
+    naam_zonder_ext = naam.rsplit(".", 1)[0] if "." in naam else naam
+    if not re.match(r'^[Cc][Vv]_\S+', naam_zonder_ext):
+        st.info(t("upload_filename_tip"))
+
     return bestand
