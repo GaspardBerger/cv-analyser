@@ -49,6 +49,22 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_why_important": "**Waarom dit belangrijk is:**",
         "results_example": "**Concreet voorbeeld:**",
         "results_cv_lang": "CV-taal gedetecteerd: {lang}",
+        # criteria checklist
+        "results_checklist": "### Alle beoordeelde criteria",
+        "results_checklist_caption": (
+            "Elk criterium hieronder telt mee voor je score — er zijn geen verborgen criteria. "
+            "Als je een criterium verbetert en je CV opnieuw uploadt, stijgt je score."
+        ),
+        "checklist_complete": "volledig in orde",
+        "checklist_met": "Volledig aanwezig",
+        "checklist_partial": "Gedeeltelijk aanwezig",
+        "checklist_not_met": "Niet aanwezig",
+        "checklist_points": "punten",
+        # address check
+        "results_adres_header": "### Adrescontrole",
+        "adres_none": "Er werd geen adres gevonden in het CV.",
+        "adres_ok": "Het adres ({adres}) is in dezelfde taal geschreven als het CV. ✓",
+        "adres_mismatch": "Let op: het adres ({adres}) lijkt niet in dezelfde taal geschreven als de rest van het CV.",
         # score labels (internal English keys → display text)
         "score_needs_work": "Vereist veel werk",
         "score_sufficient": "Voldoende",
@@ -132,6 +148,22 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_why_important": "**Pourquoi c'est important :**",
         "results_example": "**Exemple concret :**",
         "results_cv_lang": "Langue du CV détectée : {lang}",
+        # criteria checklist
+        "results_checklist": "### Tous les critères évalués",
+        "results_checklist_caption": (
+            "Chaque critère ci-dessous compte pour votre score — il n'y a pas de critères cachés. "
+            "Si vous améliorez un critère et téléchargez à nouveau votre CV, votre score augmente."
+        ),
+        "checklist_complete": "entièrement en ordre",
+        "checklist_met": "Entièrement présent",
+        "checklist_partial": "Partiellement présent",
+        "checklist_not_met": "Absent",
+        "checklist_points": "points",
+        # address check
+        "results_adres_header": "### Vérification de l'adresse",
+        "adres_none": "Aucune adresse n'a été trouvée dans le CV.",
+        "adres_ok": "L'adresse ({adres}) est écrite dans la même langue que le CV. ✓",
+        "adres_mismatch": "Attention : l'adresse ({adres}) ne semble pas être écrite dans la même langue que le reste du CV.",
         # score labels
         "score_needs_work": "À améliorer",
         "score_sufficient": "Suffisant",
@@ -215,6 +247,22 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_why_important": "**Why this matters:**",
         "results_example": "**Concrete example:**",
         "results_cv_lang": "CV language detected: {lang}",
+        # criteria checklist
+        "results_checklist": "### All assessed criteria",
+        "results_checklist_caption": (
+            "Every criterion below counts towards your score — there are no hidden criteria. "
+            "If you improve a criterion and re-upload your CV, your score goes up."
+        ),
+        "checklist_complete": "fully met",
+        "checklist_met": "Fully present",
+        "checklist_partial": "Partially present",
+        "checklist_not_met": "Not present",
+        "checklist_points": "points",
+        # address check
+        "results_adres_header": "### Address check",
+        "adres_none": "No address was found in the CV.",
+        "adres_ok": "The address ({adres}) is written in the same language as the CV. ✓",
+        "adres_mismatch": "Note: the address ({adres}) does not appear to be written in the same language as the rest of the CV.",
         # score labels
         "score_needs_work": "Needs work",
         "score_sufficient": "Sufficient",

@@ -83,6 +83,44 @@ def toon_resultaten(resultaat: dict) -> None:
             )
             st.progress(percentage / 100)
 
+    # Volledige criteria-checklist — elk beoordeeld criterium is zichtbaar
+    checklist = resultaat.get("criteria_checklist", [])
+    if checklist:
+        st.markdown(t("results_checklist"))
+        st.caption(t("results_checklist_caption"))
+        per_categorie: dict[str, list[dict]] = {}
+        for item in checklist:
+            per_categorie.setdefault(item["categorie"], []).append(item)
+
+        for cat_id, items in per_categorie.items():
+            volledig = sum(1 for i in items if i.get("score", 0) >= 1)
+            titel = f"{t(f'cat_{cat_id}')} — {volledig}/{len(items)} {t('checklist_complete')}"
+            with st.expander(titel, expanded=False):
+                for item in items:
+                    item_score = item.get("score", 0)
+                    if item_score >= 1:
+                        icoon, status = "✅", t("checklist_met")
+                    elif item_score >= 0.5:
+                        icoon, status = "🟡", t("checklist_partial")
+                    else:
+                        icoon, status = "❌", t("checklist_not_met")
+                    st.markdown(f"{icoon} **{status}** ({item.get('gewicht', 0)} {t('checklist_points')}) — {item['beschrijving']}")
+                    if item.get("toelichting"):
+                        st.caption(item["toelichting"])
+
+    # Adrescontrole
+    adres_check = resultaat.get("adres_check") or {}
+    if adres_check:
+        st.markdown(t("results_adres_header"))
+        adres = adres_check.get("adres", "")
+        opmerking = adres_check.get("opmerking", "")
+        if not adres_check.get("adres_gevonden"):
+            st.info(t("adres_none"))
+        elif adres_check.get("komt_overeen"):
+            st.success(t("adres_ok", adres=adres))
+        else:
+            st.warning(t("adres_mismatch", adres=adres) + (f" {opmerking}" if opmerking else ""))
+
     # Sterke punten
     sterke_punten = resultaat.get("sterke_punten", [])
     if sterke_punten:

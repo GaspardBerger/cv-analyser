@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """CV-Analysator — Gluon Educatie. Streamlit hoofdapplicatie."""
 
+import json
 import os
 import sys
 
@@ -63,6 +64,17 @@ with _lang_col:
 st.session_state["lang"] = LANGUAGE_OPTIONS[_selected]
 
 
+# Zelfde CV-tekst + zelfde criteria + zelfde taal → exact hetzelfde rapport.
+# De cache leeft enkel in het geheugen (max. 2 uur), er wordt niets op schijf bewaard.
+@st.cache_data(ttl=7200, max_entries=200, show_spinner=False)
+def _analyseer_gecached(cv_tekst: str, criteria_json: str, lang: str) -> dict:
+    return analyseer_cv(
+        cv_tekst,
+        criteria_override=json.loads(criteria_json) if criteria_json else None,
+        lang=lang,
+    )
+
+
 def _controleer_api_sleutel() -> bool:
     sleutel = os.environ.get("ANTHROPIC_API_KEY", "")
     if not sleutel or not sleutel.startswith("sk-"):
@@ -121,12 +133,12 @@ if bestand is not None:
             # Niet-blokkerend: OCR werd gebruikt
             ocr_gebruikt = (melding == "ocr_gebruikt")
 
-            # Stap 2: analyse via Claude API
+            # Stap 2: analyse via Claude API (gecached: identieke input → identiek rapport)
             try:
-                resultaat = analyseer_cv(
+                resultaat = _analyseer_gecached(
                     tekst,
-                    criteria_override=criteria_override,
-                    lang=st.session_state["lang"],
+                    json.dumps(criteria_override, sort_keys=True, ensure_ascii=False) if criteria_override else "",
+                    st.session_state["lang"],
                 )
             except RuntimeError as fout:
                 st.error(str(fout))

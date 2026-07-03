@@ -1,4 +1,4 @@
-versie: "1.1"
+versie: "1.2"
 context:
   doelgroep: "Jongeren op zoek naar werk in Brussel (Belgische/Europese markt)"
   taal_hint: "CV kan in NL, FR of EN zijn — analyseer in de taal van het CV maar geef analyse in het Nederlands"
@@ -91,6 +91,10 @@ categorieen:
         beschrijving: "Consistent en professioneel taalgebruik doorheen het volledige document"
         verplicht: true
         gewicht: 6
+      - id: adres_taal
+        beschrijving: "Het adres (straatnaam en gemeente) is geschreven in dezelfde taal als de rest van het CV; veel Brusselse straten en gemeenten hebben een NL- én FR-variant (Wetstraat / Rue de la Loi, Elsene / Ixelles) — gebruik de variant die past bij de taal van het CV"
+        verplicht: false
+        gewicht: 2
       - id: realistische_claims
         beschrijving: "Geen onrealistische of overdreven uitspraken zoals 'perfecte kennis', 'beschikbaar wanneer u wil', absolute superlatieven of kwalificaties die niet geloofwaardig zijn voor een jongere starter"
         verplicht: false

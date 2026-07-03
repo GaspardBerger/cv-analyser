@@ -7,6 +7,9 @@ An AI-powered resume analysis tool built with Streamlit and Claude. Upload a CV 
 - **Multi-format upload** — accepts PDF and DOCX files
 - **AI analysis** — uses Claude to evaluate CVs against a configurable set of criteria
 - **Customizable criteria** — reviewers can edit the evaluation standards directly in the UI via `config/criteria.yaml`
+- **Deterministic, transparent scoring** — the AI only judges each criterion as met / partially met / not met; the score itself is computed in Python from the fixed weights in `criteria.yaml`. Every assessed criterion is shown in the results (no hidden criteria), so improving a criterion and re-uploading always raises the score
+- **Stable re-uploads** — results are cached in memory (2h) on the extracted text, criteria and language, so re-uploading an unchanged CV returns the exact same score and remarks
+- **Address language check** — verifies that the address is written in the same language as the rest of the CV (relevant for bilingual Brussels street names, e.g. *Wetstraat* vs *Rue de la Loi*)
 - **Privacy-first** — uploaded files are handled temporarily and not stored after analysis
 
 ## Tech Stack
@@ -39,7 +42,7 @@ cv-analyser/
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.10+
 - An [Anthropic API key](https://console.anthropic.com/)
 
 ### Installation
