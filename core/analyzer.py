@@ -98,8 +98,9 @@ BEOORDELINGSWIJZE:
 - Beoordeel ELK criterium met exact één van deze waarden: 0 (niet aanwezig), 0.5 (gedeeltelijk aanwezig), 1 (volledig aanwezig)
 - Neem ELK criterium-id op in "criteria_beoordeling", zonder er over te slaan: {ids}
 - Wees strikt consistent en objectief: baseer elk oordeel uitsluitend op wat letterlijk in de CV-tekst staat, niet op interpretatie of stijlvoorkeur. Hetzelfde CV moet altijd exact dezelfde beoordeling per criterium krijgen.
-- Geef bij elk criterium een korte "toelichting" (één zin) die uitlegt waarom je 0, 0.5 of 1 gaf
-- Geef bij elk criterium met score lager dan 1 ook: "titel" (korte actiegerichte titel), "probleem" (wat ontbreekt), "waarom" (waarom het belangrijk is) en "voorbeeld" (een concreet voorbeeld dat de deelnemer kan overnemen)
+- Geef bij elk criterium een korte "toelichting" (maximaal 15 woorden) die uitlegt waarom je 0, 0.5 of 1 gaf
+- Geef bij elk criterium met score lager dan 1 ook: "titel" (korte actiegerichte titel), "probleem" (wat ontbreekt, max. 1 zin), "waarom" (waarom het belangrijk is, max. 1 zin) en "voorbeeld" (een concreet voorbeeld dat de deelnemer kan overnemen, max. 2 zinnen)
+- Wees beknopt: geen herhaling, geen inleidende zinnen
 - Gebruik een bemoedigende en constructieve toon, geschikt voor jongeren die de arbeidsmarkt betreden
 - Noem ook 2–3 sterke punten om de deelnemer te motiveren
 
@@ -257,7 +258,7 @@ def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None, lang: str
 
     bericht = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=4096,
+        max_tokens=8192,
         temperature=0.0,
         system=system_prompt,
         messages=[
@@ -268,6 +269,13 @@ def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None, lang: str
         ],
     )
 
+    if bericht.stop_reason == "max_tokens":
+        raise RuntimeError(
+            "De analyse was te lang en werd afgebroken. "
+            "Probeer het opnieuw; blijft het probleem zich voordoen, "
+            "controleer dan of het geüploade bestand echt een CV is."
+        )
+
     ruwe_tekst = bericht.content[0].text.strip()
     ruwe = _parseer_json(ruwe_tekst)
     return _bereken_resultaat(ruwe, criteria_data)
@@ -275,6 +283,9 @@ def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None, lang: str
 
 def _parseer_json(tekst: str) -> dict:
     """Parseer JSON uit de Claude-respons, met een regex-fallback voor onverwacht omringende tekst."""
+    # Verwijder eventuele markdown-codeblokken (```json ... ```)
+    tekst = re.sub(r"^```(?:json)?\s*|\s*```$", "", tekst.strip())
+
     try:
         return json.loads(tekst)
     except json.JSONDecodeError:
