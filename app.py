@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from core.analyzer import analyseer_cv
 from core.extractor import extraheer_tekst
+from core.preview import pdf_metadata
 from core.privacy import tijdelijk_bestand
 from translations import LANGUAGE_OPTIONS, t
 from ui.criteria_editor import toon_criteria_editor
@@ -36,7 +37,7 @@ from ui.upload import toon_upload_widget
 st.set_page_config(
     page_title="CV Analyser — Gluon Educatie",
     page_icon="📄",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
@@ -49,6 +50,14 @@ if "lang" not in st.session_state:
     st.session_state["lang"] = "nl"
 if "ocr_gebruikt" not in st.session_state:
     st.session_state.ocr_gebruikt = False
+# Bestand + tekst tijdelijk bijhouden voor de CV-preview (enkel in het geheugen
+# van deze sessie; wordt gewist bij een nieuwe analyse)
+if "cv_bestand_bytes" not in st.session_state:
+    st.session_state.cv_bestand_bytes = None
+if "cv_extensie" not in st.session_state:
+    st.session_state.cv_extensie = ""
+if "cv_tekst" not in st.session_state:
+    st.session_state.cv_tekst = ""
 
 # Language selector (small, top right)
 _lang_options = list(LANGUAGE_OPTIONS.keys())
@@ -67,11 +76,12 @@ st.session_state["lang"] = LANGUAGE_OPTIONS[_selected]
 # Zelfde CV-tekst + zelfde criteria + zelfde taal → exact hetzelfde rapport.
 # De cache leeft enkel in het geheugen (max. 2 uur), er wordt niets op schijf bewaard.
 @st.cache_data(ttl=7200, max_entries=200, show_spinner=False)
-def _analyseer_gecached(cv_tekst: str, criteria_json: str, lang: str) -> dict:
+def _analyseer_gecached(cv_tekst: str, criteria_json: str, lang: str, extra_info: str) -> dict:
     return analyseer_cv(
         cv_tekst,
         criteria_override=json.loads(criteria_json) if criteria_json else None,
         lang=lang,
+        extra_info=extra_info,
     )
 
 
@@ -86,6 +96,9 @@ def _controleer_api_sleutel() -> bool:
 def _nieuwe_analyse():
     st.session_state.analyse_resultaat = None
     st.session_state.ocr_gebruikt = False
+    st.session_state.cv_bestand_bytes = None
+    st.session_state.cv_extensie = ""
+    st.session_state.cv_tekst = ""
     st.rerun()
 
 
@@ -102,7 +115,12 @@ if not _controleer_api_sleutel():
 if st.session_state.analyse_resultaat is not None:
     if st.session_state.ocr_gebruikt:
         st.info(t("ocr_info"))
-    toon_resultaten(st.session_state.analyse_resultaat)
+    toon_resultaten(
+        st.session_state.analyse_resultaat,
+        bestand_bytes=st.session_state.cv_bestand_bytes,
+        extensie=st.session_state.cv_extensie,
+        cv_tekst=st.session_state.cv_tekst,
+    )
     st.divider()
     if st.button(t("btn_new_analysis"), type="secondary"):
         _nieuwe_analyse()
@@ -133,12 +151,17 @@ if bestand is not None:
             # Niet-blokkerend: OCR werd gebruikt
             ocr_gebruikt = (melding == "ocr_gebruikt")
 
+            # Technische gegevens (pagina's, lettergroottes) voor de lay-outcriteria
+            bestand_bytes = bytes(bestand.getbuffer())
+            extra_info = pdf_metadata(bestand_bytes) if extensie == ".pdf" else ""
+
             # Stap 2: analyse via Claude API (gecached: identieke input → identiek rapport)
             try:
                 resultaat = _analyseer_gecached(
                     tekst,
                     json.dumps(criteria_override, sort_keys=True, ensure_ascii=False) if criteria_override else "",
                     st.session_state["lang"],
+                    extra_info,
                 )
             except RuntimeError as fout:
                 st.error(str(fout))
@@ -153,6 +176,9 @@ if bestand is not None:
 
         st.session_state.analyse_resultaat = resultaat
         st.session_state.ocr_gebruikt = ocr_gebruikt
+        st.session_state.cv_bestand_bytes = bestand_bytes
+        st.session_state.cv_extensie = extensie.lstrip(".")
+        st.session_state.cv_tekst = tekst
         st.rerun()
 
 # Voettekst

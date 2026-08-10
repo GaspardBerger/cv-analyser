@@ -6,7 +6,9 @@ An AI-powered resume analysis tool built with Streamlit and Claude. Upload a CV 
 
 - **Multi-format upload** — accepts PDF and DOCX files
 - **AI analysis** — uses Claude to evaluate CVs against a configurable set of criteria
-- **Customizable criteria** — reviewers can edit the evaluation standards directly in the UI via `config/criteria.yaml`
+- **Checklist-based criteria** — the criteria in `config/criteria.yaml` mirror the paper CV checklist (layout + content) that students complete manually first; a CV that meets the full checklist scores 100/100
+- **Customizable criteria** — trainers can toggle, edit and add their own criteria directly in the UI for the current session
+- **Annotated CV preview** — results are shown in two columns: numbered improvement points on the left, and the CV on the right with the corresponding problem areas marked by dashed boxes (PDF pages rendered via PyMuPDF; text-based preview for Word files)
 - **Deterministic, transparent scoring** — the AI only judges each criterion as met / partially met / not met; the score itself is computed in Python from the fixed weights in `criteria.yaml`. Every assessed criterion is shown in the results (no hidden criteria), so improving a criterion and re-uploading always raises the score
 - **Stable re-uploads** — results are cached in memory (2h) on the extracted text, criteria and language, so re-uploading an unchanged CV returns the exact same score and remarks
 - **Address language check** — verifies that the address is written in the same language as the rest of the CV (relevant for bilingual Brussels street names, e.g. *Wetstraat* vs *Rue de la Loi*)

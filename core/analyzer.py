@@ -32,7 +32,7 @@ _LANG_INSTRUCTIONS = {
     "en": "give the analysis in English",
 }
 
-MAX_VERBETERPUNTEN = 5
+MAX_VERBETERPUNTEN = 10
 
 
 def _score_label(score: int) -> str:
@@ -66,7 +66,8 @@ def _bouw_criteria_tekst(criteria_data: dict) -> str:
         regels.append(f"\n## {cat['naam']} (gewicht: {cat['gewicht']}%)")
         for c in actief:
             verplicht = "VERPLICHT" if c.get("verplicht") else "optioneel"
-            regels.append(f"{teller}. [{verplicht}] {c['beschrijving']} (id: {c['id']})")
+            handmatig = " [HANDMATIG]" if c.get("handmatig") else ""
+            regels.append(f"{teller}. [{verplicht}]{handmatig} {c['beschrijving']} (id: {c['id']})")
             teller += 1
     return "\n".join(regels)
 
@@ -87,7 +88,7 @@ def _bouw_system_prompt(criteria_data: dict, lang: str = "nl") -> str:
 
     return f"""Je bent een CV-expert voor de Belgische arbeidsmarkt, gespecialiseerd in het helpen van {doelgroep} bij het verbeteren van hun CV.
 
-Je beoordeelt het CV criterium per criterium. Jij berekent GEEN totaalscore — dat gebeurt achteraf automatisch op basis van vaste gewichten.
+Je beoordeelt het CV criterium per criterium. Jij berekent GEEN totaalscore — dat gebeurt achteraf automatisch op basis van vaste gewichten. De criteria volgen de papieren CV-checklist die de deelnemers vooraf zelf doorlopen: wie alles in orde heeft, moet op elk criterium een 1 krijgen.
 
 TAALINSTRUCTIE: Het CV kan in NL, FR of EN zijn. {taal_instructie}.
 
@@ -99,7 +100,10 @@ BEOORDELINGSWIJZE:
 - Neem ELK criterium-id op in "criteria_beoordeling", zonder er over te slaan: {ids}
 - Wees strikt consistent en objectief: baseer elk oordeel uitsluitend op wat letterlijk in de CV-tekst staat, niet op interpretatie of stijlvoorkeur. Hetzelfde CV moet altijd exact dezelfde beoordeling per criterium krijgen.
 - Geef bij elk criterium een korte "toelichting" (maximaal 15 woorden) die uitlegt waarom je 0, 0.5 of 1 gaf
-- Geef bij elk criterium met score lager dan 1 ook: "titel" (korte actiegerichte titel), "probleem" (wat ontbreekt, max. 1 zin), "waarom" (waarom het belangrijk is, max. 1 zin) en "voorbeeld" (een concreet voorbeeld dat de deelnemer kan overnemen, max. 2 zinnen)
+- Geef bij elk criterium met score lager dan 1 ook: "titel" (korte actiegerichte titel), "probleem" (wat ontbreekt, max. 1 zin), "waarom" (waarom het belangrijk is, max. 1 zin), "voorbeeld" (een concreet voorbeeld dat de deelnemer kan overnemen, max. 2 zinnen) en "citaat"
+- "citaat" = een kort LETTERLIJK fragment (max. 8 woorden, exact overgenomen uit de CV-tekst, inclusief hoofdletters en leestekens) van de plek waar het probleem zichtbaar is; gebruik null als het probleem iets is dat ONTBREEKT en dus nergens aan te wijzen valt
+- Criteria gemarkeerd met [HANDMATIG] zijn visuele aspecten die niet betrouwbaar uit tekstextractie te beoordelen zijn: geef daar score 1 (voordeel van de twijfel), tenzij de tekst duidelijk het tegendeel bewijst, en vermeld in de toelichting dat dit zelf visueel nagekeken moet worden
+- Na de CV-tekst kunnen TECHNISCHE GEGEVENS volgen (aantal pagina's, lettergroottes, lettertypes — automatisch gemeten). Gebruik die voor de criteria over lengte, leesbaarheid en lettertype. Ontbreken ze, geef dan bij die criteria het voordeel van de twijfel met een opmerking om het zelf na te kijken
 - Wees beknopt: geen herhaling, geen inleidende zinnen
 - Gebruik een bemoedigende en constructieve toon, geschikt voor jongeren die de arbeidsmarkt betreden
 - Noem ook 2–3 sterke punten om de deelnemer te motiveren
@@ -112,8 +116,9 @@ ADRESCONTROLE:
 VERPLICHT OUTPUT FORMAT — geef ENKEL dit JSON-object terug, zonder markdown, zonder uitleg erbuiten:
 {{
   "criteria_beoordeling": {{
-    "contactgegevens": {{"score": 1, "toelichting": "..."}},
-    "meetbare_prestaties": {{"score": 0, "toelichting": "...", "titel": "...", "probleem": "...", "waarom": "...", "voorbeeld": "..."}}
+    "contact_naam": {{"score": 1, "toelichting": "..."}},
+    "contact_email": {{"score": 0, "toelichting": "...", "titel": "...", "probleem": "...", "waarom": "...", "voorbeeld": "...", "citaat": "coolboy2008@hotmail.com"}},
+    "extra_geboortedatum": {{"score": 0, "toelichting": "...", "titel": "...", "probleem": "...", "waarom": "...", "voorbeeld": "...", "citaat": null}}
   }},
   "sterke_punten": ["...", "..."],
   "taal_cv": "nl",
@@ -177,6 +182,7 @@ def _bereken_resultaat(ruwe: dict, criteria_data: dict) -> dict:
                 "categorie": cat_id,
                 "beschrijving": c["beschrijving"],
                 "verplicht": bool(c.get("verplicht")),
+                "handmatig": bool(c.get("handmatig")),
                 "score": verdict,
                 "gewicht": round(gewicht, 1),
                 "toelichting": beoordeling.get("toelichting", ""),
@@ -192,6 +198,7 @@ def _bereken_resultaat(ruwe: dict, criteria_data: dict) -> dict:
                     "probleem": beoordeling.get("probleem", ""),
                     "waarom": beoordeling.get("waarom", ""),
                     "voorbeeld": beoordeling.get("voorbeeld", ""),
+                    "citaat": beoordeling.get("citaat") or "",
                 })
 
         totaal_raw += behaald
@@ -214,6 +221,7 @@ def _bereken_resultaat(ruwe: dict, criteria_data: dict) -> dict:
             "probleem": kandidaat["probleem"],
             "waarom": kandidaat["waarom"],
             "voorbeeld": kandidaat["voorbeeld"],
+            "citaat": kandidaat["citaat"],
             "criterium_id": kandidaat["criterium_id"],
         })
 
@@ -231,9 +239,17 @@ def _bereken_resultaat(ruwe: dict, criteria_data: dict) -> dict:
     }
 
 
-def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None, lang: str = "nl") -> dict:
+def analyseer_cv(
+    cv_tekst: str,
+    criteria_override: dict | None = None,
+    lang: str = "nl",
+    extra_info: str = "",
+) -> dict:
     """
     Analyseer een CV-tekst via de Claude API.
+
+    extra_info: optionele technische gegevens (aantal pagina's, lettergroottes…)
+    die worden meegestuurd voor de lay-outcriteria.
 
     Geeft terug: dict met score, volledige criteria-checklist, verbeterpunten,
     sterke punten en adrescontrole.
@@ -264,7 +280,8 @@ def analyseer_cv(cv_tekst: str, criteria_override: dict | None = None, lang: str
         messages=[
             {
                 "role": "user",
-                "content": f"Analyseer dit CV:\n\n{cv_tekst}",
+                "content": f"Analyseer dit CV:\n\n{cv_tekst}"
+                + (f"\n\nTECHNISCHE GEGEVENS (automatisch gemeten):\n{extra_info}" if extra_info else ""),
             }
         ],
     )

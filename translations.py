@@ -49,17 +49,24 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_why_important": "**Waarom dit belangrijk is:**",
         "results_example": "**Concreet voorbeeld:**",
         "results_cv_lang": "CV-taal gedetecteerd: {lang}",
+        "results_no_improvements": "Geen verbeterpunten gevonden — alles van de checklist is in orde!",
+        # CV-preview
+        "results_preview_header": "### CV-preview",
+        "results_preview_text_note": "Voorbeeld op basis van de uitgelezen tekst (Word-bestand) — de originele lay-out kan afwijken.",
+        "results_preview_unavailable": "Geen preview beschikbaar voor dit bestand.",
+        "results_see_marker": "📍 Zie kader {n} op de CV-preview rechts",
         # criteria checklist
-        "results_checklist": "### Alle beoordeelde criteria",
+        "results_checklist": "### Alle beoordeelde criteria (de CV-checklist)",
         "results_checklist_caption": (
-            "Elk criterium hieronder telt mee voor je score — er zijn geen verborgen criteria. "
-            "Als je een criterium verbetert en je CV opnieuw uploadt, stijgt je score."
+            "Dit zijn exact de criteria van de papieren CV-checklist — er zijn geen verborgen criteria. "
+            "Als je alles van de checklist in orde brengt en je CV opnieuw uploadt, behaal je 100/100."
         ),
         "checklist_complete": "volledig in orde",
         "checklist_met": "Volledig aanwezig",
         "checklist_partial": "Gedeeltelijk aanwezig",
         "checklist_not_met": "Niet aanwezig",
         "checklist_points": "punten",
+        "checklist_manual": "zelf visueel na te kijken",
         # address check
         "results_adres_header": "### Adrescontrole",
         "adres_none": "Er werd geen adres gevonden in het CV.",
@@ -73,8 +80,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "score_excellent": "Uitstekend",
         "score_unknown": "Onbekend",
         # category names
-        "cat_structuur_opmaak": "Structuur & Opmaak",
+        "cat_lay_out": "Lay-out",
         "cat_inhoud": "Inhoud",
+        "cat_structuur_opmaak": "Structuur & Opmaak",
         "cat_taal_schrijfstijl": "Taal & Schrijfstijl",
         "cat_professionaliteit": "Professionaliteit",
         # priority labels
@@ -88,11 +96,15 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "cv_lang_fr": "Frans",
         "cv_lang_en": "Engels",
         # criteria editor
-        "criteria_expander": "Criteria aanpassen (voor begeleiders)",
+        "criteria_expander": "🛠️ Criteria aanpassen of eigen criteria toevoegen (voor begeleiders)",
         "criteria_caption": (
-            "Hier kun je criteria aan- of uitzetten en beschrijvingen aanpassen voor deze sessie. "
+            "Hier kun je criteria aan- of uitzetten, beschrijvingen aanpassen én per categorie "
+            "eigen criteria toevoegen voor deze sessie. "
             "Wijzigingen worden **niet** opgeslagen en verdwijnen wanneer de pagina wordt vernieuwd."
         ),
+        "criteria_new_label": "Nieuw criterium",
+        "criteria_new_placeholder": "Beschrijf je eigen criterium en klik op 'Toevoegen'…",
+        "criteria_new_btn": "➕ Toevoegen",
         "criteria_reset": "Standaard criteria herstellen",
         "criteria_weight": "huidig gewicht: {weight}%",
         "criteria_context_header": "**Contextuele instellingen**",
@@ -148,17 +160,24 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_why_important": "**Pourquoi c'est important :**",
         "results_example": "**Exemple concret :**",
         "results_cv_lang": "Langue du CV détectée : {lang}",
+        "results_no_improvements": "Aucun point d'amélioration trouvé — tout est en ordre selon la checklist !",
+        # CV-preview
+        "results_preview_header": "### Aperçu du CV",
+        "results_preview_text_note": "Aperçu basé sur le texte extrait (fichier Word) — la mise en page originale peut différer.",
+        "results_preview_unavailable": "Aucun aperçu disponible pour ce fichier.",
+        "results_see_marker": "📍 Voir le cadre {n} sur l'aperçu du CV à droite",
         # criteria checklist
-        "results_checklist": "### Tous les critères évalués",
+        "results_checklist": "### Tous les critères évalués (la checklist CV)",
         "results_checklist_caption": (
-            "Chaque critère ci-dessous compte pour votre score — il n'y a pas de critères cachés. "
-            "Si vous améliorez un critère et téléchargez à nouveau votre CV, votre score augmente."
+            "Ce sont exactement les critères de la checklist CV papier — il n'y a pas de critères cachés. "
+            "Si vous mettez tout en ordre selon la checklist et téléchargez à nouveau votre CV, vous obtenez 100/100."
         ),
         "checklist_complete": "entièrement en ordre",
         "checklist_met": "Entièrement présent",
         "checklist_partial": "Partiellement présent",
         "checklist_not_met": "Absent",
         "checklist_points": "points",
+        "checklist_manual": "à vérifier visuellement soi-même",
         # address check
         "results_adres_header": "### Vérification de l'adresse",
         "adres_none": "Aucune adresse n'a été trouvée dans le CV.",
@@ -172,8 +191,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "score_excellent": "Excellent",
         "score_unknown": "Inconnu",
         # category names
-        "cat_structuur_opmaak": "Structure & Mise en page",
+        "cat_lay_out": "Mise en page",
         "cat_inhoud": "Contenu",
+        "cat_structuur_opmaak": "Structure & Mise en page",
         "cat_taal_schrijfstijl": "Langue & Style",
         "cat_professionaliteit": "Professionnalisme",
         # priority labels
@@ -187,11 +207,15 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "cv_lang_fr": "Français",
         "cv_lang_en": "Anglais",
         # criteria editor
-        "criteria_expander": "Modifier les critères (pour les formateurs)",
+        "criteria_expander": "🛠️ Modifier les critères ou ajouter vos propres critères (pour les formateurs)",
         "criteria_caption": (
-            "Vous pouvez activer ou désactiver des critères et modifier les descriptions pour cette session. "
+            "Vous pouvez activer ou désactiver des critères, modifier les descriptions et ajouter "
+            "vos propres critères par catégorie pour cette session. "
             "Les modifications ne sont **pas enregistrées** et disparaissent lors du rechargement de la page."
         ),
+        "criteria_new_label": "Nouveau critère",
+        "criteria_new_placeholder": "Décrivez votre propre critère et cliquez sur « Ajouter »…",
+        "criteria_new_btn": "➕ Ajouter",
         "criteria_reset": "Rétablir les critères par défaut",
         "criteria_weight": "poids actuel : {weight}%",
         "criteria_context_header": "**Paramètres contextuels**",
@@ -247,17 +271,24 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_why_important": "**Why this matters:**",
         "results_example": "**Concrete example:**",
         "results_cv_lang": "CV language detected: {lang}",
+        "results_no_improvements": "No improvement points found — everything on the checklist is in order!",
+        # CV-preview
+        "results_preview_header": "### CV preview",
+        "results_preview_text_note": "Preview based on the extracted text (Word file) — the original layout may differ.",
+        "results_preview_unavailable": "No preview available for this file.",
+        "results_see_marker": "📍 See box {n} on the CV preview on the right",
         # criteria checklist
-        "results_checklist": "### All assessed criteria",
+        "results_checklist": "### All assessed criteria (the CV checklist)",
         "results_checklist_caption": (
-            "Every criterion below counts towards your score — there are no hidden criteria. "
-            "If you improve a criterion and re-upload your CV, your score goes up."
+            "These are exactly the criteria from the paper CV checklist — there are no hidden criteria. "
+            "If you fix everything on the checklist and re-upload your CV, you score 100/100."
         ),
         "checklist_complete": "fully met",
         "checklist_met": "Fully present",
         "checklist_partial": "Partially present",
         "checklist_not_met": "Not present",
         "checklist_points": "points",
+        "checklist_manual": "check visually yourself",
         # address check
         "results_adres_header": "### Address check",
         "adres_none": "No address was found in the CV.",
@@ -271,8 +302,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "score_excellent": "Excellent",
         "score_unknown": "Unknown",
         # category names
-        "cat_structuur_opmaak": "Structure & Layout",
+        "cat_lay_out": "Layout",
         "cat_inhoud": "Content",
+        "cat_structuur_opmaak": "Structure & Layout",
         "cat_taal_schrijfstijl": "Language & Style",
         "cat_professionaliteit": "Professionalism",
         # priority labels
@@ -286,11 +318,15 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "cv_lang_fr": "French",
         "cv_lang_en": "English",
         # criteria editor
-        "criteria_expander": "Adjust criteria (for trainers)",
+        "criteria_expander": "🛠️ Adjust criteria or add your own criteria (for trainers)",
         "criteria_caption": (
-            "You can enable or disable criteria and edit descriptions for this session. "
+            "You can enable or disable criteria, edit descriptions and add your own criteria "
+            "per category for this session. "
             "Changes are **not saved** and disappear when the page is refreshed."
         ),
+        "criteria_new_label": "New criterion",
+        "criteria_new_placeholder": "Describe your own criterion and click 'Add'…",
+        "criteria_new_btn": "➕ Add",
         "criteria_reset": "Restore default criteria",
         "criteria_weight": "current weight: {weight}%",
         "criteria_context_header": "**Contextual settings**",

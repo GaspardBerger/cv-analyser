@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Trainer-interface voor het tijdelijk aanpassen van CV-criteria binnen een sessie."""
+"""Trainer-interface voor het tijdelijk aanpassen en toevoegen van CV-criteria binnen een sessie."""
 
 import copy
+import re
 
 import streamlit as st
 import yaml
@@ -74,6 +75,35 @@ def toon_criteria_editor() -> dict | None:
                 if nieuwe_beschrijving != criterium["beschrijving"]:
                     categorieen[cat_id]["criteria"][i]["beschrijving"] = nieuwe_beschrijving
                     gewijzigd = True
+
+            # Eigen criterium toevoegen aan deze categorie
+            col_input, col_btn = st.columns([0.75, 0.25])
+            with col_input:
+                nieuw_criterium = st.text_input(
+                    t("criteria_new_label"),
+                    key=f"nieuw_{cat_id}",
+                    placeholder=t("criteria_new_placeholder"),
+                    label_visibility="collapsed",
+                )
+            with col_btn:
+                toevoegen = st.button(t("criteria_new_btn"), key=f"nieuw_btn_{cat_id}")
+            if toevoegen and nieuw_criterium.strip():
+                bestaande_ids = {c["id"] for c in cat["criteria"]}
+                basis_id = re.sub(r"[^a-z0-9]+", "_", nieuw_criterium.lower()).strip("_")[:40] or "eigen_criterium"
+                nieuw_id = basis_id
+                teller = 2
+                while nieuw_id in bestaande_ids:
+                    nieuw_id = f"{basis_id}_{teller}"
+                    teller += 1
+                categorieen[cat_id]["criteria"].append({
+                    "id": nieuw_id,
+                    "beschrijving": nieuw_criterium.strip(),
+                    "verplicht": False,
+                    "gewicht": 1,
+                    "actief": True,
+                })
+                st.session_state["criteria_override"] = criteria_werk
+                st.rerun()
 
             st.markdown("---")
 
