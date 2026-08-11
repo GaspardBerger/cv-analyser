@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from core.analyzer import analyseer_cv
 from core.extractor import extraheer_tekst
+from core.impact import nl_getal, schatting
 from core.preview import pdf_metadata
 from core.privacy import tijdelijk_bestand
 from translations import LANGUAGE_OPTIONS, t
@@ -102,9 +103,36 @@ def _nieuwe_analyse():
     st.rerun()
 
 
+def _toon_voettekst():
+    """Voettekst met de energie-inschatting; op elke pagina van de app."""
+    st.divider()
+    with st.expander(t("impact_header"), expanded=False):
+        # Basisgeval (tekst-PDF of Word); een scan kost ongeveer het dubbele,
+        # dat staat in de toelichting eronder.
+        s = schatting(met_ocr=False)
+        st.markdown(t(
+            "impact_body",
+            wh=nl_getal(s["energie_wh"]),
+            kwh=nl_getal(s["energie_kwh"], 3),
+            co2=nl_getal(s["co2_g"], 2),
+            koker=nl_getal(s["waterkoker_s"]),
+            lamp=nl_getal(s["ledlamp_min"]),
+            telefoon=nl_getal(s["smartphone_aantal"], 0),
+            auto=nl_getal(s["auto_m"]),
+        ))
+        st.caption(t("impact_note"))
+    st.caption(t("footer"))
+
+
 # Header
 st.markdown(f"# {t('app_header')}")
 st.markdown(t("app_subtitle"))
+
+# Privacyverklaring — duidelijk zichtbaar op elke pagina
+st.success(t("privacy_short"))
+with st.expander(t("privacy_header"), expanded=False):
+    st.markdown(t("privacy_body"))
+
 st.divider()
 
 # API-sleutel controleren
@@ -124,6 +152,7 @@ if st.session_state.analyse_resultaat is not None:
     st.divider()
     if st.button(t("btn_new_analysis"), type="secondary"):
         _nieuwe_analyse()
+    _toon_voettekst()
     st.stop()
 
 # Upload-widget
@@ -182,5 +211,4 @@ if bestand is not None:
         st.rerun()
 
 # Voettekst
-st.divider()
-st.caption(t("footer"))
+_toon_voettekst()

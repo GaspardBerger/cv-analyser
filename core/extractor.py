@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
-"""Tekstextractie uit PDF- en DOCX-bestanden voor CV-analyse.
+"""Tekstextractie uit PDF-, DOCX- en JPG-bestanden voor CV-analyse.
 
 Strategie voor PDF's:
 1. pdfplumber  — snel, werkt voor tekst-gebaseerde PDF's
 2. PyMuPDF     — tweede poging, beter bij sommige PDF-types
 3. Claude OCR  — fallback voor gescande/afbeelding-PDF's (via Vision API)
+
+JPG-bestanden (scans van een papieren CV) gaan altijd via Claude OCR.
 """
 
 from pathlib import Path
+
+# Langste zijde waarnaar afbeeldingen worden verkleind voor de Vision API:
+# groter levert nauwelijks betere tekstherkenning op, maar kost wel meer energie.
+MAX_ZIJDE_PX = 1568
+
+_OCR_INSTRUCTIE = (
+    "Extraheer alle tekst uit dit CV-beeld zo volledig en nauwkeurig mogelijk. "
+    "Behoud de structuur (secties, koppen). "
+    "Geef alleen de tekst terug, zonder commentaar of uitleg."
+)
 
 
 def extraheer_tekst(bestandspad: str) -> tuple[str, str | None]:
@@ -26,8 +38,13 @@ def extraheer_tekst(bestandspad: str) -> tuple[str, str | None]:
         return _extraheer_pdf(bestandspad)
     elif suffix in (".docx", ".doc"):
         return _extraheer_docx(bestandspad)
+    elif suffix in (".jpg", ".jpeg"):
+        return _extraheer_afbeelding(bestandspad)
     else:
-        return "", f"Bestandsformaat '{suffix}' wordt niet ondersteund. Gebruik PDF of DOCX."
+        return "", (
+            f"Bestandsformaat '{suffix}' wordt niet ondersteund. "
+            "Gebruik PDF, Word (.docx) of een scan in JPG."
+        )
 
 
 # ── PDF ──────────────────────────────────────────────────────────────────────
@@ -137,14 +154,7 @@ def _ocr_via_claude_vision(pad: str) -> tuple[str, str | None]:
                                 "data": img_b64,
                             },
                         },
-                        {
-                            "type": "text",
-                            "text": (
-                                "Extraheer alle tekst uit dit CV-beeld zo volledig en nauwkeurig mogelijk. "
-                                "Behoud de structuur (secties, koppen). "
-                                "Geef alleen de tekst terug, zonder commentaar of uitleg."
-                            ),
-                        },
+                        {"type": "text", "text": _OCR_INSTRUCTIE},
                     ],
                 }],
             )
@@ -165,6 +175,78 @@ def _ocr_via_claude_vision(pad: str) -> tuple[str, str | None]:
     # Tekst gevonden via OCR — informatie voor de gebruiker (niet-blokkerend)
     ocr_melding = "ocr_gebruikt"
     return tekst, ocr_melding
+
+
+# ── JPG (scan van een papieren CV) ───────────────────────────────────────────
+
+def _extraheer_afbeelding(pad: str) -> tuple[str, str | None]:
+    """Lees de tekst van een gescand CV in JPG via Claude Vision."""
+    import base64
+    import os
+
+    try:
+        import fitz  # PyMuPDF: opent ook JPG's en kan ze schalen
+    except ImportError:
+        return "", "PyMuPDF is niet geïnstalleerd. Voer 'pip install PyMuPDF' uit."
+
+    try:
+        import anthropic
+    except ImportError:
+        return "", "anthropic is niet geïnstalleerd."
+
+    api_sleutel = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_sleutel:
+        return "", "API-sleutel niet beschikbaar voor tekstherkenning."
+
+    try:
+        doc = fitz.open(pad)
+        pagina = doc[0]
+        rect = pagina.rect
+        # Verklein grote telefoonfoto's: scheelt energie zonder verlies aan leesbaarheid
+        schaal = min(1.0, MAX_ZIJDE_PX / max(rect.width, rect.height))
+        pix = pagina.get_pixmap(matrix=fitz.Matrix(schaal, schaal))
+        img_b64 = base64.standard_b64encode(pix.tobytes("png")).decode()
+    except Exception:
+        return "", (
+            "Deze afbeelding kon niet worden gelezen. "
+            "Sla je CV op als PDF of maak een nieuwe scan in JPG."
+        )
+
+    client = anthropic.Anthropic(api_key=api_sleutel)
+    try:
+        bericht = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=2000,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/png",
+                            "data": img_b64,
+                        },
+                    },
+                    {"type": "text", "text": _OCR_INSTRUCTIE},
+                ],
+            }],
+        )
+        tekst = bericht.content[0].text.strip()
+    except Exception:
+        return "", (
+            "De tekstherkenning is mislukt. Controleer je internetverbinding "
+            "en probeer het opnieuw."
+        )
+
+    if not tekst or len(tekst) < 50:
+        return "", (
+            "Er kon nauwelijks tekst worden herkend in deze afbeelding. "
+            "Zorg voor een rechte, scherpe scan van enkel het CV — geen foto "
+            "met een tafel of achtergrond errond — of upload je CV als PDF."
+        )
+
+    return tekst, "ocr_gebruikt"
 
 
 # ── DOCX ─────────────────────────────────────────────────────────────────────

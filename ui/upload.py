@@ -7,7 +7,8 @@ import streamlit as st
 
 from translations import t
 
-TOEGESTANE_TYPES = ["pdf", "docx"]
+TOEGESTANE_TYPES = ["pdf", "docx", "jpg", "jpeg"]
+AFBEELDING_TYPES = ("jpg", "jpeg")
 MAX_GROOTTE_MB = 10
 
 
@@ -18,6 +19,7 @@ def toon_upload_widget() -> object | None:
     """
     st.markdown(t("upload_header"))
     st.caption(t("upload_caption"))
+    st.info(t("upload_scan_note"))
 
     bestand = st.file_uploader(
         label=t("upload_label"),
@@ -42,6 +44,10 @@ def toon_upload_widget() -> object | None:
         return None
 
     st.success(t("upload_success", name=naam, size=grootte_mb))
+
+    # Bij een foto/scan: herinner aan de eisen voor een leesbaar resultaat
+    if extensie in AFBEELDING_TYPES:
+        st.warning(t("upload_scan_warning"))
 
     # Bestandsnaam controleren op aanbevolen formaat: Cv_Voornaam Naam
     naam_zonder_ext = naam.rsplit(".", 1)[0] if "." in naam else naam

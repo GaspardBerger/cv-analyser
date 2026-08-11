@@ -4,7 +4,7 @@ An AI-powered resume analysis tool built with Streamlit and Claude. Upload a CV 
 
 ## Features
 
-- **Multi-format upload** — accepts PDF and DOCX files
+- **Multi-format upload** — accepts PDF, DOCX and JPG (a scan of a paper CV; JPGs are read with Claude Vision OCR)
 - **AI analysis** — uses Claude to evaluate CVs against a configurable set of criteria
 - **Checklist-based criteria** — the criteria in `config/criteria.yaml` mirror the paper CV checklist (layout + content) that students complete manually first; a CV that meets the full checklist scores 100/100
 - **Customizable criteria** — trainers can toggle, edit and add their own criteria directly in the UI for the current session
@@ -12,7 +12,8 @@ An AI-powered resume analysis tool built with Streamlit and Claude. Upload a CV 
 - **Deterministic, transparent scoring** — the AI only judges each criterion as met / partially met / not met; the score itself is computed in Python from the fixed weights in `criteria.yaml`. Every assessed criterion is shown in the results (no hidden criteria), so improving a criterion and re-uploading always raises the score
 - **Stable re-uploads** — results are cached in memory (2h) on the extracted text, criteria and language, so re-uploading an unchanged CV returns the exact same score and remarks
 - **Address language check** — verifies that the address is written in the same language as the rest of the CV (relevant for bilingual Brussels street names, e.g. *Wetstraat* vs *Rue de la Loi*)
-- **Privacy-first** — uploaded files are handled temporarily and not stored after analysis
+- **Privacy-first** — uploaded files are written to a temp file only to extract the text, then deleted; no database, no account, no logs. An explicit, plain-language privacy panel on every page explains exactly what happens to the data
+- **Energy footprint** — a footer panel estimates the energy and CO₂ of one analysis and compares it with household appliances; the assumptions and sources are documented in `core/impact.py`
 
 ## Tech Stack
 
@@ -32,7 +33,9 @@ cv-analyser/
 │   └── criteria.yaml       # Evaluation criteria
 ├── core/
 │   ├── analyzer.py         # Claude API integration
-│   ├── extractor.py        # Document text extraction
+│   ├── extractor.py        # Document text extraction (PDF, DOCX, JPG via OCR)
+│   ├── impact.py           # Energy/CO2 estimate per analysis
+│   ├── preview.py          # PDF metadata + annotated CV preview
 │   └── privacy.py          # Temporary file handling
 └── ui/
     ├── upload.py           # File upload component

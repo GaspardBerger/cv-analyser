@@ -37,6 +37,7 @@ def toon_resultaten(
     verbeterpunten = resultaat.get("verbeterpunten", [])
 
     # Preview voorbereiden (bepaalt ook welke punten op het CV gemarkeerd zijn)
+    is_afbeelding = extensie in ("jpg", "jpeg")
     preview_afbeeldingen: list[bytes] = []
     preview_html = ""
     gemarkeerd: set[int] = set()
@@ -44,6 +45,8 @@ def toon_resultaten(
         preview_afbeeldingen, gemarkeerd = render_pdf_met_markeringen(
             bestand_bytes, verbeterpunten
         )
+    # Bij een scan (JPG) staat de tekst als beeld op de foto: kaders kunnen daar
+    # niet op geplaatst worden, dus tonen we het beeld én de gemarkeerde tekst.
     if not preview_afbeeldingen and cv_tekst:
         preview_html, gemarkeerd = tekst_preview_html(cv_tekst, verbeterpunten)
 
@@ -67,11 +70,15 @@ def toon_resultaten(
         if preview_afbeeldingen:
             for afbeelding in preview_afbeeldingen:
                 st.image(afbeelding, use_container_width=True)
-        elif preview_html:
-            st.caption(t("results_preview_text_note"))
-            st.markdown(preview_html, unsafe_allow_html=True)
         else:
-            st.info(t("results_preview_unavailable"))
+            if is_afbeelding and bestand_bytes:
+                st.image(bestand_bytes, use_container_width=True)
+                st.caption(t("results_preview_image_note"))
+            if preview_html:
+                st.caption(t("results_preview_text_note"))
+                st.markdown(preview_html, unsafe_allow_html=True)
+            elif not is_afbeelding:
+                st.info(t("results_preview_unavailable"))
 
     # Sterke punten (na de fouten)
     sterke_punten = resultaat.get("sterke_punten", [])

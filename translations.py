@@ -27,14 +27,55 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "Er is een onverwachte fout opgetreden: {error}",
         "footer": "Gluon Educatie — CV-Analysator v1.0 | Gegevens worden niet opgeslagen",
-        "ocr_info": "Dit CV was een gescande PDF en kon niet rechtstreeks worden uitgelezen. De tekst werd herkend via AI (OCR) — de analyse is normaal bruikbaar, maar kan minder nauwkeurig zijn bij een onleesbare scan.",
+        "ocr_info": "Dit CV was een scan of afbeelding en kon niet rechtstreeks worden uitgelezen. De tekst werd herkend via AI (OCR) — de analyse is normaal bruikbaar, maar kan minder nauwkeurig zijn bij een onscherpe scan.",
+        # privacy
+        "privacy_short": "🔒 **Je CV wordt niet bewaard.** Er is geen database en geen account. Zodra je het tabblad sluit, is alles weg.",
+        "privacy_header": "🔒 Wat gebeurt er precies met mijn gegevens?",
+        "privacy_body": (
+            "- **Je bestand wordt niet opgeslagen.** Het wordt heel even naar een tijdelijk bestand "
+            "geschreven om de tekst eruit te lezen, en meteen daarna verwijderd.\n"
+            "- **Er is geen database, geen account en geen logboek** met jouw gegevens. "
+            "Niemand — ook je begeleider niet — kan je CV achteraf opvragen.\n"
+            "- De tekst van je CV wordt via een beveiligde verbinding naar de Anthropic-API gestuurd "
+            "om de analyse te maken. **Anthropic gebruikt deze tekst niet om AI-modellen te trainen.**\n"
+            "- Zolang je dit venster openhoudt, blijft je resultaat in het werkgeheugen van de server staan. "
+            "Daardoor krijg je exact dezelfde score als je hetzelfde CV opnieuw uploadt. "
+            "Dat vervalt automatisch na maximaal 2 uur, of zodra je op “Nieuw CV analyseren” klikt.\n"
+            "- **Sluit je het tabblad, dan is alles weg.**"
+        ),
+        # energie & CO2
+        "impact_header": "🌱 Wat kost één analyse aan energie?",
+        "impact_body": (
+            "Eén CV analyseren kost naar schatting **{wh} Wh** ({kwh} kWh) en **{co2} g CO₂**.\n\n"
+            "Dat is ongeveer evenveel als:\n"
+            "- een **waterkoker** die {koker} seconden kookt\n"
+            "- een **ledlamp** die {lamp} minuten brandt\n"
+            "- {telefoon} analyses ≈ één keer je **smartphone opladen**\n"
+            "- de CO₂ van **{auto} meter** met de auto rijden"
+        ),
+        "impact_note": (
+            "Ruwe schatting, geen meting. Gebaseerd op publiek gerapporteerde cijfers "
+            "(Google meldde in augustus 2025 een mediaan van 0,24 Wh voor één tekstprompt) "
+            "en op de hoeveelheid tekst die deze app verstuurt en ontvangt. De echte waarde ligt "
+            "vermoedelijk tussen 0,5 en 2 Wh. Bij een gescand CV of een JPG komt er tekstherkenning "
+            "bij: reken dan op ongeveer het dubbele."
+        ),
         # upload
         "upload_header": "### Jouw CV uploaden",
-        "upload_caption": "Ondersteunde formaten: PDF en Word (.docx) — maximaal 10 MB",
+        "upload_caption": "Ondersteunde formaten: PDF, Word (.docx) en JPG — maximaal 10 MB",
+        "upload_scan_note": (
+            "📄 **Een PDF geeft het beste resultaat**: daarop kunnen we de fouten rechtstreeks aanduiden.\n\n"
+            "📷 **Een JPG mag ook, maar enkel als scan van je CV** — dus niet een foto waarop ook je tafel, "
+            "je handen of de achtergrond te zien zijn. Zorg dat het blad recht en scherp in beeld staat."
+        ),
+        "upload_scan_warning": (
+            "Je uploadde een afbeelding. Controleer of dit een rechte, scherpe scan is van **enkel het CV**. "
+            "Let op: op een afbeelding kunnen we de fouten niet met kaders aanduiden — je krijgt ze wel in de lijst."
+        ),
         "upload_label": "Kies je CV",
         "upload_help": "Sleep je CV hierheen of klik om een bestand te kiezen.",
         "upload_error_size": "Het bestand is te groot ({size:.1f} MB). Maximale bestandsgrootte is {max} MB.",
-        "upload_error_type": "Bestandstype '.{ext}' wordt niet ondersteund. Upload een PDF- of Word-bestand (.docx).",
+        "upload_error_type": "Bestandstype '.{ext}' wordt niet ondersteund. Upload een PDF, een Word-bestand (.docx) of een scan in JPG.",
         "upload_success": "Bestand geladen: **{name}** ({size:.2f} MB)",
         "upload_filename_tip": "Tip voor de bestandsnaam: gebruik bij voorkeur **Cv_Voornaam Naam.pdf** (bijv. Cv_Jana Claes.pdf). Je kunt ook 'student' en de functie toevoegen: Cv_Jana Claes student Onthaal.pdf",
         # results
@@ -52,7 +93,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_no_improvements": "Geen verbeterpunten gevonden — alles van de checklist is in orde!",
         # CV-preview
         "results_preview_header": "### CV-preview",
-        "results_preview_text_note": "Voorbeeld op basis van de uitgelezen tekst (Word-bestand) — de originele lay-out kan afwijken.",
+        "results_preview_text_note": "Voorbeeld op basis van de uitgelezen tekst — de originele lay-out kan afwijken.",
+        "results_preview_image_note": "Op een scan of foto kunnen we geen kaders plaatsen. Hieronder staat de herkende tekst mét de markeringen.",
         "results_preview_unavailable": "Geen preview beschikbaar voor dit bestand.",
         "results_see_marker": "📍 Zie kader {n} op de CV-preview rechts",
         # criteria checklist
@@ -138,14 +180,55 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "Une erreur inattendue s'est produite : {error}",
         "footer": "Gluon Educatie — Analyseur de CV v1.0 | Les données ne sont pas conservées",
-        "ocr_info": "Ce CV était un PDF scanné et n'a pas pu être lu directement. Le texte a été reconnu par IA (OCR) — l'analyse est normalement exploitable, mais peut être moins précise si le scan est peu lisible.",
+        "ocr_info": "Ce CV était un scan ou une image et n'a pas pu être lu directement. Le texte a été reconnu par IA (OCR) — l'analyse est normalement exploitable, mais peut être moins précise si le scan est flou.",
+        # privacy
+        "privacy_short": "🔒 **Votre CV n'est pas conservé.** Il n'y a ni base de données ni compte. Dès que vous fermez l'onglet, tout disparaît.",
+        "privacy_header": "🔒 Que se passe-t-il exactement avec mes données ?",
+        "privacy_body": (
+            "- **Votre fichier n'est pas enregistré.** Il est écrit très brièvement dans un fichier temporaire "
+            "pour en extraire le texte, puis supprimé immédiatement.\n"
+            "- **Il n'y a ni base de données, ni compte, ni journal** contenant vos données. "
+            "Personne — pas même votre formateur — ne peut consulter votre CV après coup.\n"
+            "- Le texte de votre CV est envoyé via une connexion sécurisée à l'API d'Anthropic pour réaliser "
+            "l'analyse. **Anthropic n'utilise pas ce texte pour entraîner ses modèles d'IA.**\n"
+            "- Tant que vous gardez cette fenêtre ouverte, votre résultat reste dans la mémoire vive du serveur. "
+            "Vous obtenez ainsi exactement le même score si vous téléchargez à nouveau le même CV. "
+            "Cela expire automatiquement après 2 heures maximum, ou dès que vous cliquez sur « Analyser un nouveau CV ».\n"
+            "- **Si vous fermez l'onglet, tout disparaît.**"
+        ),
+        # énergie & CO2
+        "impact_header": "🌱 Combien d'énergie coûte une analyse ?",
+        "impact_body": (
+            "Analyser un CV coûte environ **{wh} Wh** ({kwh} kWh) et **{co2} g de CO₂**.\n\n"
+            "Cela équivaut à peu près à :\n"
+            "- une **bouilloire** qui chauffe pendant {koker} secondes\n"
+            "- une **ampoule LED** allumée pendant {lamp} minutes\n"
+            "- {telefoon} analyses ≈ une recharge complète de votre **smartphone**\n"
+            "- le CO₂ de **{auto} mètres** parcourus en voiture"
+        ),
+        "impact_note": (
+            "Estimation approximative, pas une mesure. Basée sur des chiffres publiés "
+            "(en août 2025, Google indiquait une médiane de 0,24 Wh pour une requête texte) "
+            "et sur la quantité de texte que cette application envoie et reçoit. La valeur réelle se situe "
+            "probablement entre 0,5 et 2 Wh. Pour un CV scanné ou un JPG, la reconnaissance de texte "
+            "s'ajoute : comptez environ le double."
+        ),
         # upload
         "upload_header": "### Télécharger votre CV",
-        "upload_caption": "Formats acceptés : PDF et Word (.docx) — 10 Mo maximum",
+        "upload_caption": "Formats acceptés : PDF, Word (.docx) et JPG — 10 Mo maximum",
+        "upload_scan_note": (
+            "📄 **Un PDF donne le meilleur résultat** : nous pouvons y indiquer les erreurs directement.\n\n"
+            "📷 **Un JPG est accepté, mais uniquement comme scan de votre CV** — pas une photo où l'on voit "
+            "aussi votre table, vos mains ou l'arrière-plan. Veillez à ce que la feuille soit droite et nette."
+        ),
+        "upload_scan_warning": (
+            "Vous avez téléchargé une image. Vérifiez qu'il s'agit d'un scan droit et net **du CV uniquement**. "
+            "Attention : sur une image, nous ne pouvons pas encadrer les erreurs — elles figurent bien dans la liste."
+        ),
         "upload_label": "Choisir votre CV",
         "upload_help": "Faites glisser votre CV ici ou cliquez pour choisir un fichier.",
         "upload_error_size": "Le fichier est trop volumineux ({size:.1f} Mo). La taille maximale est de {max} Mo.",
-        "upload_error_type": "Le type de fichier '.{ext}' n'est pas pris en charge. Téléchargez un fichier PDF ou Word (.docx).",
+        "upload_error_type": "Le type de fichier '.{ext}' n'est pas pris en charge. Téléchargez un PDF, un fichier Word (.docx) ou un scan en JPG.",
         "upload_success": "Fichier chargé : **{name}** ({size:.2f} Mo)",
         "upload_filename_tip": "Conseil sur le nom du fichier : utilisez de préférence **Cv_Prénom Nom.pdf** (ex. Cv_Jana Claes.pdf). Vous pouvez aussi ajouter 'étudiant' et la fonction visée : Cv_Jana Claes étudiant Accueil.pdf",
         # results
@@ -163,7 +246,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_no_improvements": "Aucun point d'amélioration trouvé — tout est en ordre selon la checklist !",
         # CV-preview
         "results_preview_header": "### Aperçu du CV",
-        "results_preview_text_note": "Aperçu basé sur le texte extrait (fichier Word) — la mise en page originale peut différer.",
+        "results_preview_text_note": "Aperçu basé sur le texte extrait — la mise en page originale peut différer.",
+        "results_preview_image_note": "Sur un scan ou une photo, nous ne pouvons pas placer de cadres. Le texte reconnu, avec les marquages, figure ci-dessous.",
         "results_preview_unavailable": "Aucun aperçu disponible pour ce fichier.",
         "results_see_marker": "📍 Voir le cadre {n} sur l'aperçu du CV à droite",
         # criteria checklist
@@ -249,14 +333,55 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "An unexpected error occurred: {error}",
         "footer": "Gluon Educatie — CV Analyser v1.0 | Data is not stored",
-        "ocr_info": "This CV was a scanned PDF and could not be read directly. The text was recognised using AI (OCR) — the analysis is normally usable, but may be less accurate if the scan quality is poor.",
+        "ocr_info": "This CV was a scan or an image and could not be read directly. The text was recognised using AI (OCR) — the analysis is normally usable, but may be less accurate if the scan is blurry.",
+        # privacy
+        "privacy_short": "🔒 **Your CV is not stored.** There is no database and no account. As soon as you close the tab, everything is gone.",
+        "privacy_header": "🔒 What exactly happens to my data?",
+        "privacy_body": (
+            "- **Your file is not saved.** It is briefly written to a temporary file to extract the text, "
+            "and deleted immediately afterwards.\n"
+            "- **There is no database, no account and no log** containing your data. "
+            "Nobody — not even your trainer — can retrieve your CV afterwards.\n"
+            "- The text of your CV is sent over a secure connection to the Anthropic API to produce the "
+            "analysis. **Anthropic does not use this text to train AI models.**\n"
+            "- As long as you keep this window open, your result stays in the server's memory. "
+            "That is what makes you get exactly the same score if you re-upload the same CV. "
+            "It expires automatically after at most 2 hours, or as soon as you click “Analyse a new CV”.\n"
+            "- **Close the tab and everything is gone.**"
+        ),
+        # energy & CO2
+        "impact_header": "🌱 How much energy does one analysis cost?",
+        "impact_body": (
+            "Analysing one CV costs an estimated **{wh} Wh** ({kwh} kWh) and **{co2} g CO₂**.\n\n"
+            "That is roughly the same as:\n"
+            "- a **kettle** boiling for {koker} seconds\n"
+            "- an **LED lamp** burning for {lamp} minutes\n"
+            "- {telefoon} analyses ≈ one full **smartphone charge**\n"
+            "- the CO₂ of driving **{auto} metres** by car"
+        ),
+        "impact_note": (
+            "Rough estimate, not a measurement. Based on publicly reported figures "
+            "(in August 2025 Google reported a median of 0.24 Wh for a single text prompt) "
+            "and on the amount of text this app sends and receives. The real value is probably "
+            "between 0.5 and 2 Wh. For a scanned CV or a JPG, text recognition is added: "
+            "expect roughly double."
+        ),
         # upload
         "upload_header": "### Upload your CV",
-        "upload_caption": "Supported formats: PDF and Word (.docx) — maximum 10 MB",
+        "upload_caption": "Supported formats: PDF, Word (.docx) and JPG — maximum 10 MB",
+        "upload_scan_note": (
+            "📄 **A PDF gives the best result**: we can mark the mistakes directly on it.\n\n"
+            "📷 **A JPG is allowed too, but only as a scan of your CV** — not a photo that also shows your "
+            "table, your hands or the background. Make sure the sheet is straight and sharp."
+        ),
+        "upload_scan_warning": (
+            "You uploaded an image. Check that this is a straight, sharp scan of **the CV only**. "
+            "Note: on an image we cannot mark the mistakes with boxes — you will still get them in the list."
+        ),
         "upload_label": "Choose your CV",
         "upload_help": "Drag your CV here or click to choose a file.",
         "upload_error_size": "The file is too large ({size:.1f} MB). Maximum file size is {max} MB.",
-        "upload_error_type": "File type '.{ext}' is not supported. Upload a PDF or Word file (.docx).",
+        "upload_error_type": "File type '.{ext}' is not supported. Upload a PDF, a Word file (.docx) or a scan in JPG.",
         "upload_success": "File loaded: **{name}** ({size:.2f} MB)",
         "upload_filename_tip": "File name tip: preferably use **Cv_FirstName LastName.pdf** (e.g. Cv_Jana Claes.pdf). You can also add 'student' and the job function: Cv_Jana Claes student Reception.pdf",
         # results
@@ -274,7 +399,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "results_no_improvements": "No improvement points found — everything on the checklist is in order!",
         # CV-preview
         "results_preview_header": "### CV preview",
-        "results_preview_text_note": "Preview based on the extracted text (Word file) — the original layout may differ.",
+        "results_preview_text_note": "Preview based on the extracted text — the original layout may differ.",
+        "results_preview_image_note": "On a scan or photo we cannot place boxes. The recognised text, with the markings, is shown below.",
         "results_preview_unavailable": "No preview available for this file.",
         "results_see_marker": "📍 See box {n} on the CV preview on the right",
         # criteria checklist
