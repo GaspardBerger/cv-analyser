@@ -8,59 +8,68 @@
 - DOCX: geen paginaweergave mogelijk; de uitgeleste tekst wordt getoond als
   HTML waarin de citaten met een stippellijnkader gemarkeerd zijn.
 
-Ook: pdf_metadata() meet aantal pagina's, lettergroottes en lettertypes,
-zodat de lay-outcriteria (lengte, leesbaarheid, consequent lettertype)
-objectief beoordeeld kunnen worden.
+De verbeterpunten worden eerst met rangschik_op_positie() op volgorde van het
+CV gezet: punt 1 is het bovenste probleem op de pagina, zodat de nummering
+links van boven naar onder meeloopt met de preview rechts.
+
+De technische metingen (lettergroottes, uitlijning, verborgen tekst, foto)
+staan in core/inspectie.py.
 """
 
 import html
-import re
 
 _ROOD = (0.91, 0.30, 0.24)  # #e74c3c, zelfde rood als de UI
 
 
-# ── PDF-metadata voor de lay-outcriteria ─────────────────────────────────────
+# ── Volgorde: van boven naar onder op het CV ─────────────────────────────────
 
-def pdf_metadata(pdf_bytes: bytes) -> str:
-    """Meet aantal pagina's, lettergroottes en lettertypes van een PDF.
+def rangschik_op_positie(
+    verbeterpunten: list[dict], pdf_bytes: bytes | None = None, cv_tekst: str = ""
+) -> list[dict]:
+    """Zet de verbeterpunten in de volgorde waarin ze op het CV voorkomen.
 
-    Geeft een leesbare tekst terug voor de analyseprompt, of "" bij mislukking.
+    Punt 1 staat dus bovenaan het CV en de nummering loopt naar beneden mee met
+    de preview. Punten zonder vindplaats (iets dat ONTBREEKT, en dus nergens
+    aan te wijzen valt) komen achteraan, in de volgorde van de criteria.
     """
-    try:
-        import fitz  # PyMuPDF
-    except ImportError:
-        return ""
+    if not verbeterpunten:
+        return []
 
-    try:
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-        groottes: dict[float, int] = {}
-        lettertypes: set[str] = set()
+    posities: dict[int, tuple] = {}
 
-        for pagina in doc:
-            for blok in pagina.get_text("dict")["blocks"]:
-                for lijn in blok.get("lines", []):
-                    for span in lijn.get("spans", []):
-                        tekst = span.get("text", "").strip()
-                        if not tekst:
-                            continue
-                        grootte = round(span.get("size", 0), 1)
-                        groottes[grootte] = groottes.get(grootte, 0) + len(tekst)
-                        lettertypes.add(re.sub(r"^[A-Z]{6}\+", "", span.get("font", "")))
+    doc = None
+    if pdf_bytes:
+        try:
+            import fitz
 
-        if not groottes:
-            return f"- Aantal pagina's: {len(doc)}"
+            doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        except Exception:
+            doc = None
 
-        meest_gebruikt = max(groottes.items(), key=lambda kv: kv[1])[0]
-        # Negeer groottes met minder dan 20 tekens (paginanummers, voetnoten)
-        relevante = [g for g, n in groottes.items() if n >= 20] or list(groottes)
-        return (
-            f"- Aantal pagina's: {len(doc)}\n"
-            f"- Kleinste lettergrootte (hoofdtekst): {min(relevante)}pt\n"
-            f"- Meest gebruikte lettergrootte: {meest_gebruikt}pt\n"
-            f"- Gebruikte lettertypes: {', '.join(sorted(lettertypes))}"
-        )
-    except Exception:
-        return ""
+    for i, punt in enumerate(verbeterpunten):
+        citaat = (punt.get("citaat") or "").strip()
+        if not citaat:
+            continue
+        if doc is not None:
+            for paginanr, pagina in enumerate(doc):
+                rects = _zoek_citaat(pagina, citaat)
+                if rects:
+                    posities[i] = (paginanr, round(rects[0].y0, 1), round(rects[0].x0, 1))
+                    break
+        elif cv_tekst:
+            index = cv_tekst.find(citaat)
+            if index >= 0:
+                posities[i] = (0, index, 0)
+
+    met_plaats = sorted(posities, key=lambda i: posities[i])
+    zonder_plaats = [i for i in range(len(verbeterpunten)) if i not in posities]
+
+    gerangschikt = []
+    for nieuw_nummer, i in enumerate(met_plaats + zonder_plaats, start=1):
+        punt = dict(verbeterpunten[i])
+        punt["prioriteit"] = nieuw_nummer
+        gerangschikt.append(punt)
+    return gerangschikt
 
 
 # ── PDF-preview met markeringen ──────────────────────────────────────────────

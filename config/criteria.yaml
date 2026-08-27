@@ -1,13 +1,14 @@
-versie: "2.0"
+versie: "2.1"
 context:
   doelgroep: "Jongeren op zoek naar werk in Brussel (Belgische/Europese markt)"
   taal_hint: "CV kan in NL, FR of EN zijn — analyseer in de taal van het CV maar geef analyse in het Nederlands"
   markt: "Belgische arbeidsmarkt, Brusselse regio"
   bron: "Gebaseerd op de papieren CV-checklist (lay-out + inhoud) die leerlingen eerst manueel doorlopen; wie alles van de checklist in orde heeft, behaalt 100/100"
 
-# handmatig: true = niet betrouwbaar te beoordelen via tekstextractie (visueel aspect).
-# De AI geeft dan het voordeel van de twijfel (score 1) tenzij de tekst duidelijk
-# het tegendeel bewijst, en vermeldt dat dit zelf visueel nagekeken moet worden.
+# handmatig: true = visueel aspect dat niet uit tekstextractie te beoordelen is.
+# De AI geeft dan het voordeel van de twijfel (score 1) en meldt dat het zelf
+# nagekeken moet worden — TENZIJ er technische gegevens of een fotobeoordeling
+# meegeleverd worden; dan beoordeelt de AI het criterium gewoon.
 
 categorieen:
   lay_out:
@@ -23,7 +24,7 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: kort_bondig
-        beschrijving: "Kort en bondig: geen volledige zinnen (uitzondering: taken bij werkervaring en het profiel)"
+        beschrijving: "Kort en bondig: geen lange lopende zinnen. Uitzonderingen: de taken bij werkervaring, en het profiel — daar zijn volledige zinnen toegestaan zolang die sectie kort blijft (maximaal ongeveer 3 zinnen)"
         verplicht: true
         gewicht: 1
       - id: duidelijke_titels
@@ -35,7 +36,7 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: recent_bovenaan
-        beschrijving: "Logische volgorde: het meest recente staat bovenaan bij werkervaring en studies"
+        beschrijving: "Anti-chronologische volgorde bij werkervaring en studies: wat NU nog loopt (heden, 'sinds', 'huidig') staat helemaal bovenaan, daarna de rest van meest naar minst recent"
         verplicht: true
         gewicht: 1
       - id: aantrekkelijk
@@ -48,7 +49,7 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: hoofdletters
-        beschrijving: "Zonder fouten: alle namen, plaatsen… beginnen met een hoofdletter"
+        beschrijving: "Hoofdlettergebruik klopt overal: namen van personen, scholen, bedrijven, gemeenten, talen en sectietitels beginnen met een hoofdletter. Kijk ook de rubrieken na die vaak vergeten worden, zoals hobby's en interesses"
         verplicht: true
         gewicht: 1
       - id: consistent_lettertype
@@ -56,7 +57,7 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: uitlijning
-        beschrijving: "Uitlijning: alles staat netjes onder elkaar"
+        beschrijving: "Uitlijning: alles staat netjes onder elkaar — secties en opsommingen beginnen op dezelfde linkerlijn (gebruik de uitlijningsgegevens indien beschikbaar)"
         verplicht: false
         gewicht: 1
         handmatig: true
@@ -65,7 +66,7 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: gepaste_foto
-        beschrijving: "Gepaste foto (enkel verplicht bij een functie met klantencontact)"
+        beschrijving: "Gepaste foto: professionele houding en verzorgde uitstraling, neutrale achtergrond, geen filters, snapchat-effecten, zonnebril of vakantiekiekje. Enkel verplicht bij een functie met klantencontact (gebruik de fotobeoordeling indien beschikbaar)"
         verplicht: false
         gewicht: 1
         handmatig: true
@@ -79,7 +80,7 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: contact_adres
-        beschrijving: "Contactinfo: adres aanwezig en in dezelfde taal als het CV (voor een Nederlandstalig CV in het Nederlands, bv. 'Wetstraat', niet 'Rue de la Loi')"
+        beschrijving: "Contactinfo: adres aanwezig, in dezelfde taal als het CV, en met de GEMEENTE — niet het gewest. In een Nederlandstalig CV dus 'Sint-Jans-Molenbeek' en niet 'Molenbeek-Saint-Jean', en '1000 Brussel' enkel als de deelnemer echt in de gemeente Brussel-Stad woont; 'Brussel' als gewest is geen gemeente"
         verplicht: true
         gewicht: 1
       - id: contact_email
@@ -95,31 +96,35 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: werkervaring_volledig
-        beschrijving: "Werkervaring: elke ervaring vermeldt periode, functie/job, naam bedrijf en locatie van het bedrijf (enkel gemeente); heeft de deelnemer nog geen werkervaring, dan telt dit als in orde"
+        beschrijving: "Werkervaring: elke ervaring vermeldt periode, functie, naam bedrijf en locatie (enkel gemeente). Bij de functie hoort ook het contracttype tussen haakjes, in de vorm 'Functie (statuut)' — bijvoorbeeld 'Onthaalmedewerker (student)'. Heeft de deelnemer nog geen werkervaring, dan telt dit als in orde"
         verplicht: true
         gewicht: 1
       - id: werkervaring_taken
-        beschrijving: "Werkervaring: taken beschreven met actieve werkwoorden; zonder werkervaring telt dit als in orde"
+        beschrijving: "Werkervaring: taken beschreven met actieve werkwoorden. De infinitiefvorm telt hier ook als actief, zoals op VDAB-vacatures ('klanten onthalen', 'bestellingen klaarmaken'); ook voltooide vormen ('georganiseerd', 'ontwikkeld') zijn goed. Zonder werkervaring telt dit als in orde"
         verplicht: true
         gewicht: 1
-      - id: studies_volledig
-        beschrijving: "Studies en opleidingen: huidige studie vermeld met schooljaar, studierichting, naam school en locatie van de school (enkel gemeente)"
+      - id: studies_huidig
+        beschrijving: "Studies: de HUIDIGE of meest recente opleiding staat er volledig en duidelijk bovenaan, met schooljaar, studierichting, naam school en gemeente van de school"
         verplicht: true
         gewicht: 1
-      - id: studies_andere
-        beschrijving: "Studies en opleidingen: andere relevante studies/opleidingen vermeld en duidelijk of een diploma/attest behaald werd; zijn er geen andere opleidingen, dan telt dit als in orde"
-        verplicht: false
+      - id: studies_beperkt
+        beschrijving: "Studies: het CV somt niet alle opleidingen op, maar beperkt zich tot de huidige/meest recente opleiding en wat écht relevant is voor de job. Een lange lijst van korte of afgebroken richtingen roept vragen op bij werkgevers; bij elke vermelde opleiding is wel duidelijk of er een diploma of attest behaald werd"
+        verplicht: true
         gewicht: 1
       - id: talen_volgorde
         beschrijving: "Taalvaardigheden: juiste volgorde — Nederlands, Frans, Engels en daarna andere talen"
         verplicht: true
         gewicht: 1
       - id: talen_niveau
-        beschrijving: "Taalvaardigheden: niveau vermeld per taal (bv. basiskennis, goed, moedertaal of A1–C2)"
+        beschrijving: "Taalvaardigheden: per taal staat een niveau. Een omschrijving volstaat (basiskennis, goed, vlot, moedertaal) of een CEFR-niveau (A1–C2). Certificaten of attesten zijn een pluspunt maar NIET verplicht: het ontbreken ervan mag de score niet verlagen"
         verplicht: true
         gewicht: 1
       - id: computer
         beschrijving: "Computervaardigheden: vermeld mét niveau"
+        verplicht: true
+        gewicht: 1
+      - id: vaardigheden_zuiver
+        beschrijving: "Onder de rubrieken met vaardigheden (computer- en andere vaardigheden) staan ENKEL echte vaardigheden. Hobby's, interesses, karaktereigenschappen, taken of cursussen horen daar niet thuis maar bij 'Extra info'"
         verplicht: true
         gewicht: 1
       - id: extra_kwaliteiten
@@ -127,7 +132,7 @@ categorieen:
         verplicht: true
         gewicht: 1
       - id: extra_hobbys
-        beschrijving: "Extra info: relevante hobby's en interesses vermeld"
+        beschrijving: "Extra info: hobby's en interesses die je meerwaarde als persoon tonen — ze zeggen iets over wie je bent en wat je meebrengt naar de werkvloer (teamsport, vrijwilligerswerk, jeugdbeweging, muziek…). Een kale opsomming zonder meerwaarde telt als gedeeltelijk"
         verplicht: true
         gewicht: 1
       - id: extra_beschikbaarheid
@@ -136,5 +141,9 @@ categorieen:
         gewicht: 1
       - id: extra_geboortedatum
         beschrijving: "Extra info: geboortedatum vermeld"
+        verplicht: true
+        gewicht: 1
+      - id: realistische_claims
+        beschrijving: "Geen onrealistische claims: niemand is perfect, en dat is oké. Woorden als 'perfect', 'perfecte kennis', 'foutloos', 'altijd beschikbaar' of absolute superlatieven zijn niet geloofwaardig bij een jonge starter. Vervang ze door een eerlijke omschrijving zoals 'zeer goed'"
         verplicht: true
         gewicht: 1

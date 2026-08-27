@@ -49,9 +49,12 @@ def toon_upload_widget() -> object | None:
     if extensie in AFBEELDING_TYPES:
         st.warning(t("upload_scan_warning"))
 
-    # Bestandsnaam controleren op aanbevolen formaat: Cv_Voornaam Naam
+    # De tip over de bestandsnaam staat er altijd: ook wie het goed doet, moet
+    # zien welke naamgeving verwacht wordt.
     naam_zonder_ext = naam.rsplit(".", 1)[0] if "." in naam else naam
-    if not re.match(r'^[Cc][Vv]_\S+', naam_zonder_ext):
+    if re.match(r"^[Cc][Vv]_\S+", naam_zonder_ext):
+        st.success(t("upload_filename_ok"))
+    else:
         st.info(t("upload_filename_tip"))
 
     return bestand

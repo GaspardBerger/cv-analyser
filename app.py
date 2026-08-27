@@ -29,7 +29,13 @@ sys.path.insert(0, os.path.dirname(__file__))
 from core.analyzer import analyseer_cv
 from core.extractor import extraheer_tekst
 from core.impact import nl_getal, schatting
-from core.preview import pdf_metadata
+from core.inspectie import (
+    beoordeel_foto,
+    foto_tekst,
+    haal_foto,
+    pdf_metadata,
+    verborgen_tekst,
+)
 from core.privacy import tijdelijk_bestand
 from translations import LANGUAGE_OPTIONS, t
 from ui.criteria_editor import toon_criteria_editor
@@ -42,6 +48,18 @@ st.set_page_config(
     page_icon="📄",
     layout="wide",
     initial_sidebar_state="collapsed",
+)
+
+# Werkbalk en menu verbergen: de app is een gesloten systeem voor de workshop.
+# Dit vult .streamlit/config.toml aan, ook wanneer die niet wordt meegeladen.
+st.markdown(
+    """
+    <style>
+      [data-testid="stToolbar"], [data-testid="stDecoration"],
+      [data-testid="stStatusWidget"], #MainMenu, footer {visibility: hidden; height: 0;}
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 # Sessie-state initialiseren
@@ -79,13 +97,33 @@ st.session_state["lang"] = LANGUAGE_OPTIONS[_selected]
 # Zelfde CV-tekst + zelfde criteria + zelfde taal → exact hetzelfde rapport.
 # De cache leeft enkel in het geheugen (max. 2 uur), er wordt niets op schijf bewaard.
 @st.cache_data(ttl=7200, max_entries=200, show_spinner=False)
-def _analyseer_gecached(cv_tekst: str, criteria_json: str, lang: str, extra_info: str) -> dict:
+def _analyseer_gecached(
+    cv_tekst: str, criteria_json: str, lang: str, extra_info: str, verborgen: str
+) -> dict:
     return analyseer_cv(
         cv_tekst,
         criteria_override=json.loads(criteria_json) if criteria_json else None,
         lang=lang,
         extra_info=extra_info,
+        verborgen=verborgen,
     )
+
+
+@st.cache_data(ttl=7200, max_entries=50, show_spinner=False)
+def _inspecteer(bestand_bytes: bytes, extensie: str) -> tuple[str, str]:
+    """Meet wat de AI niet hoeft te gokken: lay-out, foto en verborgen tekst.
+
+    Geeft (technische gegevens, onzichtbare tekst) terug. Enkel voor PDF's:
+    bij een Word-bestand of een scan zijn deze metingen niet mogelijk.
+    """
+    if extensie != ".pdf":
+        return "", ""
+
+    regels = [pdf_metadata(bestand_bytes)]
+    foto = haal_foto(bestand_bytes)
+    if foto:
+        regels.append(foto_tekst(beoordeel_foto(foto)))
+    return "\n".join(r for r in regels if r), "\n".join(verborgen_tekst(bestand_bytes))
 
 
 def _controleer_api_sleutel() -> bool:
@@ -232,9 +270,9 @@ if bestand is not None:
             # Niet-blokkerend: OCR werd gebruikt
             ocr_gebruikt = (melding == "ocr_gebruikt")
 
-            # Technische gegevens (pagina's, lettergroottes) voor de lay-outcriteria
+            # Technische metingen: lay-out, foto en eventueel verborgen tekst
             bestand_bytes = bytes(bestand.getbuffer())
-            extra_info = pdf_metadata(bestand_bytes) if extensie == ".pdf" else ""
+            extra_info, verborgen = _inspecteer(bestand_bytes, extensie)
 
             # Stap 2: analyse via Claude API (gecached: identieke input → identiek rapport)
             try:
@@ -243,6 +281,7 @@ if bestand is not None:
                     json.dumps(criteria_override, sort_keys=True, ensure_ascii=False) if criteria_override else "",
                     st.session_state["lang"],
                     extra_info,
+                    verborgen,
                 )
             except RuntimeError as fout:
                 st.error(str(fout))

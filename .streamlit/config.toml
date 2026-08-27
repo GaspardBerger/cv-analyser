@@ -1,0 +1,16 @@
+# Gesloten opstelling voor gebruik in de workshop.
+# De app toont geen ontwikkelaarsknoppen: deelnemers kunnen de broncode niet
+# bekijken, forken of bewerken vanuit de pagina.
+
+[client]
+# "minimal" verbergt de werkbalk met o.a. de GitHub-/Fork-knop en "Manage app"
+toolbarMode = "minimal"
+# Geen Python-foutmeldingen met code op het scherm bij een onverwachte fout
+showErrorDetails = false
+
+[browser]
+gatherUsageStats = false
+
+[runner]
+# Snellere herstart bij een codewijziging is hier niet nodig
+fastReruns = true

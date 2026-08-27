@@ -9,7 +9,11 @@ Daaronder: sterke punten, de volledige criteria-checklist en de adrescontrole.
 
 import streamlit as st
 
-from core.preview import render_pdf_met_markeringen, tekst_preview_html
+from core.preview import (
+    rangschik_op_positie,
+    render_pdf_met_markeringen,
+    tekst_preview_html,
+)
 from translations import t
 
 # Internal English score keys → hex color
@@ -31,10 +35,17 @@ def toon_resultaten(
     """Toon de volledige analyseresultaten op het scherm."""
     st.divider()
     st.markdown(t("results_header"))
+    _toon_prompt_injectie(resultaat)
     _toon_score(resultaat)
     _toon_categorie_scores(resultaat)
 
-    verbeterpunten = resultaat.get("verbeterpunten", [])
+    # Nummer de verbeterpunten van boven naar onder op het CV, zodat punt 1
+    # links overeenkomt met het bovenste kader in de preview rechts.
+    verbeterpunten = rangschik_op_positie(
+        resultaat.get("verbeterpunten", []),
+        pdf_bytes=bestand_bytes if extensie == "pdf" else None,
+        cv_tekst=cv_tekst,
+    )
 
     # Preview voorbereiden (bepaalt ook welke punten op het CV gemarkeerd zijn)
     is_afbeelding = extensie in ("jpg", "jpeg")
@@ -60,6 +71,7 @@ def toon_resultaten(
             n = len(verbeterpunten)
             plural = t("results_improvements_plural") if n > 1 else ""
             st.caption(t("results_improvements_caption", n=n, p=plural))
+
             for vp in verbeterpunten:
                 _toon_verbeterpunt(vp, gemarkeerd)
         else:
@@ -96,6 +108,23 @@ def toon_resultaten(
     if taal:
         taal_naam = t(f"cv_lang_{taal}")
         st.caption(t("results_cv_lang", lang=taal_naam))
+
+
+def _toon_prompt_injectie(resultaat: dict) -> None:
+    """Waarschuwing bovenaan wanneer er verstopte instructies gevonden zijn."""
+    injectie = resultaat.get("prompt_injectie") or {}
+    if not injectie.get("gedetecteerd"):
+        return
+
+    st.error(t("injectie_header"))
+    st.markdown(t("injectie_uitleg"))
+    bewijs = injectie.get("bewijs", "")
+    if bewijs:
+        st.markdown(f"{t('injectie_bewijs')}")
+        st.code(bewijs, language=None)
+    if injectie.get("uitleg"):
+        st.caption(injectie["uitleg"])
+    st.caption(t("injectie_beroep"))
 
 
 def _toon_score(resultaat: dict) -> None:
@@ -200,13 +229,18 @@ def _toon_checklist(resultaat: dict) -> None:
         with st.expander(titel, expanded=False):
             for item in items:
                 item_score = item.get("score", 0)
-                if item_score >= 1:
-                    icoon, status = "✅", t("checklist_met")
-                elif item_score >= 0.5:
-                    icoon, status = "🟡", t("checklist_partial")
-                else:
+                handmatig = ""
+                if item_score < 0.5:
                     icoon, status = "❌", t("checklist_not_met")
-                handmatig = f" 👁️ {t('checklist_manual')}" if item.get("handmatig") else ""
+                elif item_score < 1:
+                    icoon, status = "🟡", t("checklist_partial")
+                elif item.get("handmatig"):
+                    # Visuele punten kunnen we niet hard bevestigen: geen groen
+                    # vinkje, maar een uitroepteken om ze zelf na te kijken.
+                    icoon, status = "❗", t("checklist_manual_status")
+                    handmatig = f" — {t('checklist_manual')}"
+                else:
+                    icoon, status = "✅", t("checklist_met")
                 st.markdown(f"{icoon} **{status}**{handmatig} — {item['beschrijving']}")
                 if item.get("toelichting"):
                     st.caption(item["toelichting"])
@@ -219,9 +253,22 @@ def _toon_adres_check(resultaat: dict) -> None:
     st.markdown(t("results_adres_header"))
     adres = adres_check.get("adres", "")
     opmerking = adres_check.get("opmerking", "")
+    suggestie = (adres_check.get("suggestie") or "").strip()
+    gemeente_ok = adres_check.get("gemeente_correct", True)
+
     if not adres_check.get("adres_gevonden"):
         st.info(t("adres_none"))
-    elif adres_check.get("komt_overeen"):
+        return
+
+    if adres_check.get("komt_overeen") and gemeente_ok:
         st.success(t("adres_ok", adres=adres))
     else:
-        st.warning(t("adres_mismatch", adres=adres) + (f" {opmerking}" if opmerking else ""))
+        melding = (
+            t("adres_gemeente", adres=adres)
+            if not gemeente_ok
+            else t("adres_mismatch", adres=adres)
+        )
+        st.warning(melding + (f" {opmerking}" if opmerking else ""))
+
+    if suggestie and suggestie != adres:
+        st.markdown(f"{t('adres_suggestie')} **{suggestie}**")

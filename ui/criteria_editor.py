@@ -1,35 +1,86 @@
 #!/usr/bin/env python3
-"""Trainer-interface voor het tijdelijk aanpassen en toevoegen van CV-criteria binnen een sessie."""
+"""Criteriaoverzicht.
+
+Voor deelnemers is dit een alleen-lezen lijst: ze zien elk criterium waarop hun
+CV beoordeeld wordt, maar kunnen er niets aan wijzigen.
+
+Begeleiders kunnen de criteria wél aanpassen en eigen criteria toevoegen, na
+het invoeren van de begeleiderscode. Die code stel je in als `TRAINER_CODE`
+bij de secrets van de app (of als omgevingsvariabele). Is er geen code
+ingesteld, dan blijft het scherm voor iedereen alleen-lezen.
+"""
 
 import copy
+import os
 import re
 
 import streamlit as st
-import yaml
 
-from core.analyzer import laad_criteria, CRITERIA_PAD
+from core.analyzer import laad_criteria
 from translations import t
+
+
+def _ingestelde_code() -> str:
+    """Lees de begeleiderscode uit de secrets of de omgeving."""
+    try:
+        if "TRAINER_CODE" in st.secrets:
+            return str(st.secrets["TRAINER_CODE"]).strip()
+    except Exception:
+        pass
+    return os.environ.get("TRAINER_CODE", "").strip()
+
+
+def _toon_alleen_lezen(criteria: dict) -> None:
+    """Toon de criteria als leeslijst, zonder invoervelden."""
+    for cat in criteria.get("categorieen", {}).values():
+        actief = [c for c in cat.get("criteria", []) if c.get("actief", True)]
+        st.markdown(f"**{cat['naam']}** ({t('criteria_weight', weight=cat['gewicht'])})")
+        for criterium in actief:
+            st.markdown(f"- {criterium['beschrijving']}")
+        st.markdown("---")
 
 
 def toon_criteria_editor() -> dict | None:
     """
-    Toon een uitklapbare editor waarmee begeleiders de criteria kunnen aanpassen.
-    Wijzigingen gelden alleen voor de huidige sessie en worden niet opgeslagen.
-    Geeft de aangepaste criteria terug als dict, of None als de standaard criteria gebruikt worden.
+    Toon het criteriaoverzicht. Geeft de aangepaste criteria terug als een
+    begeleider ze gewijzigd heeft, anders None (= standaardcriteria).
     """
     with st.expander(t("criteria_expander"), expanded=False):
+        code = _ingestelde_code()
+        ontgrendeld = bool(st.session_state.get("criteria_ontgrendeld"))
+        standaard = laad_criteria()
+        huidig = st.session_state.get("criteria_override") or standaard
+
+        if not ontgrendeld:
+            st.caption(t("criteria_readonly_caption"))
+            _toon_alleen_lezen(huidig)
+            if code:
+                with st.form("criteria_ontgrendelen"):
+                    ingave = st.text_input(t("criteria_code_label"), type="password")
+                    if st.form_submit_button(t("criteria_code_btn")):
+                        if ingave and ingave == code:
+                            st.session_state["criteria_ontgrendeld"] = True
+                            st.rerun()
+                        else:
+                            st.error(t("criteria_code_fout"))
+            else:
+                st.caption(t("criteria_locked_note"))
+            return st.session_state.get("criteria_override")
+
+        # ── Vanaf hier: begeleidersmodus ──
         st.caption(t("criteria_caption"))
 
-        if st.button(t("criteria_reset"), key="reset_criteria"):
-            if "criteria_override" in st.session_state:
-                del st.session_state["criteria_override"]
-            st.rerun()
+        kol_a, kol_b = st.columns(2)
+        with kol_a:
+            if st.button(t("criteria_reset"), key="reset_criteria"):
+                st.session_state.pop("criteria_override", None)
+                st.rerun()
+        with kol_b:
+            if st.button(t("criteria_lock"), key="lock_criteria"):
+                st.session_state["criteria_ontgrendeld"] = False
+                st.rerun()
 
-        standaard = laad_criteria()
-        criteria_werk = copy.deepcopy(
-            st.session_state.get("criteria_override") or standaard
-        )
-
+        criteria_werk = copy.deepcopy(huidig)
         gewijzigd = False
         categorieen = criteria_werk.get("categorieen", {})
 
@@ -65,11 +116,8 @@ def toon_criteria_editor() -> dict | None:
                         label_visibility="collapsed",
                     )
 
-                if not actief:
-                    categorieen[cat_id]["criteria"][i]["actief"] = False
-                    gewijzigd = True
-                elif "actief" in criterium and not criterium["actief"]:
-                    categorieen[cat_id]["criteria"][i]["actief"] = True
+                if actief != criterium.get("actief", True):
+                    categorieen[cat_id]["criteria"][i]["actief"] = actief
                     gewijzigd = True
 
                 if nieuwe_beschrijving != criterium["beschrijving"]:
@@ -123,10 +171,5 @@ def toon_criteria_editor() -> dict | None:
             st.session_state["criteria_override"] = criteria_werk
             st.info(t("criteria_active_info"))
             return criteria_werk
-
-        # Toon ook YAML-exportoptie voor permanente opslag
-        with st.expander(t("criteria_yaml_expander"), expanded=False):
-            st.code(yaml.dump(standaard, allow_unicode=True, default_flow_style=False), language="yaml")
-            st.caption(t("criteria_yaml_caption", path=CRITERIA_PAD))
 
     return st.session_state.get("criteria_override")

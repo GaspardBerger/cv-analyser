@@ -28,6 +28,19 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "error_unexpected": "Er is een onverwachte fout opgetreden: {error}",
         "footer": "Gluon Educatie — CV-Analysator v1.0 | Gegevens worden niet opgeslagen",
         "partners_support": "De workshoptools van Gluon Educatie zijn ontwikkeld met de steun van Jump naar Werk en Tracé Brussel.",
+        # prompt injection
+        "injectie_header": "Score op 0 — er staan verstopte instructies in dit CV",
+        "injectie_uitleg": (
+            "In dit CV staat tekst die **niet zichtbaar** is op de pagina en die de beoordeling "
+            "probeert te sturen. Dat is valsspelen: een werkgever of sollicitatiesysteem misleiden "
+            "telt als fraude, en daarom is de score **0/100**. De feedback hieronder blijft staan, "
+            "zodat je wel ziet wat er verder van je CV klopt."
+        ),
+        "injectie_bewijs": "**Dit is de tekst die gevonden werd:**",
+        "injectie_beroep": (
+            "Ben je het hier niet mee eens? Bespreek het met je begeleider — die kan de gevonden "
+            "tekst hierboven zelf nakijken. Per ongeluk onzichtbare tekst telt niet als valsspelen."
+        ),
         "ocr_info": "Dit CV was een scan of afbeelding en kon niet rechtstreeks worden uitgelezen. De tekst werd herkend via AI (OCR) — de analyse is normaal bruikbaar, maar kan minder nauwkeurig zijn bij een onscherpe scan.",
         # privacy
         "privacy_short": "🔒 **Je CV wordt niet bewaard.** Er is geen database en geen account. Zodra je het tabblad sluit, is alles weg.",
@@ -79,13 +92,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "upload_error_type": "Bestandstype '.{ext}' wordt niet ondersteund. Upload een PDF, een Word-bestand (.docx) of een scan in JPG.",
         "upload_success": "Bestand geladen: **{name}** ({size:.2f} MB)",
         "upload_filename_tip": "Tip voor de bestandsnaam: gebruik bij voorkeur **Cv_Voornaam Naam.pdf** (bijv. Cv_Jana Claes.pdf). Je kunt ook 'student' en de functie toevoegen: Cv_Jana Claes student Onthaal.pdf",
+        "upload_filename_ok": "De bestandsnaam volgt de aanbevolen vorm **Cv_Voornaam Naam** — goed zo. Een werkgever ziet meteen van wie het CV is.",
         # results
         "results_header": "## Resultaten van je CV-analyse",
         "results_summary": "**Samenvatting**",
         "results_cat_scores": "### Score per categorie",
         "results_strengths": "### Wat je al goed doet",
         "results_improvements": "### Hoe je je CV kunt verbeteren",
-        "results_improvements_caption": "{n} verbeterpunt{p}, van meest naar minst impactvol",
+        "results_improvements_caption": "{n} verbeterpunt{p}, in dezelfde volgorde als op je CV: van boven naar onder",
         "results_improvements_plural": "en",
         "results_what_missing": "**Wat ontbreekt:**",
         "results_why_important": "**Waarom dit belangrijk is:**",
@@ -109,12 +123,15 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "checklist_partial": "Gedeeltelijk aanwezig",
         "checklist_not_met": "Niet aanwezig",
         "checklist_points": "punten",
-        "checklist_manual": "zelf visueel na te kijken",
+        "checklist_manual": "dit kunnen we niet automatisch controleren, kijk het zelf na",
+        "checklist_manual_status": "Zelf na te kijken",
         # address check
         "results_adres_header": "### Adrescontrole",
         "adres_none": "Er werd geen adres gevonden in het CV.",
         "adres_ok": "Het adres ({adres}) is in dezelfde taal geschreven als het CV. ✓",
         "adres_mismatch": "Let op: het adres ({adres}) lijkt niet in dezelfde taal geschreven als de rest van het CV.",
+        "adres_gemeente": "Let op: bij het adres ({adres}) staat geen gemeente, of het gewest in plaats van de gemeente. Werkgevers willen de gemeente zien.",
+        "adres_suggestie": "Zo zou het adres eruit moeten zien:",
         # score labels (internal English keys → display text)
         "score_needs_work": "Vereist veel werk",
         "score_sufficient": "Voldoende",
@@ -139,7 +156,13 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "cv_lang_fr": "Frans",
         "cv_lang_en": "Engels",
         # criteria editor
-        "criteria_expander": "🛠️ Criteria aanpassen of eigen criteria toevoegen (voor begeleiders)",
+        "criteria_expander": "📋 De beoordelingscriteria bekijken",
+        "criteria_readonly_caption": "Dit zijn alle criteria waarop je CV beoordeeld wordt. Je kunt ze hier lezen; aanpassen kan enkel de begeleider.",
+        "criteria_locked_note": "De criteria staan vast voor deze workshop.",
+        "criteria_code_label": "Begeleiderscode",
+        "criteria_code_btn": "Ontgrendelen",
+        "criteria_code_fout": "Die code klopt niet.",
+        "criteria_lock": "🔒 Weer vergrendelen",
         "criteria_caption": (
             "Hier kun je criteria aan- of uitzetten, beschrijvingen aanpassen én per categorie "
             "eigen criteria toevoegen voor deze sessie. "
@@ -182,6 +205,19 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "error_unexpected": "Une erreur inattendue s'est produite : {error}",
         "footer": "Gluon Educatie — Analyseur de CV v1.0 | Les données ne sont pas conservées",
         "partners_support": "Les outils d'atelier de Gluon Educatie ont été développés avec le soutien de Jump naar Werk et Tracé Brussel.",
+        # prompt injection
+        "injectie_header": "Score à 0 — des instructions cachées figurent dans ce CV",
+        "injectie_uitleg": (
+            "Ce CV contient du texte **invisible** sur la page qui tente d'influencer l'évaluation. "
+            "C'est de la triche : induire en erreur un employeur ou un système de recrutement est "
+            "considéré comme une fraude, d'où le score de **0/100**. Le reste du retour ci-dessous "
+            "est conservé, pour que vous voyiez ce qui va par ailleurs dans votre CV."
+        ),
+        "injectie_bewijs": "**Voici le texte qui a été trouvé :**",
+        "injectie_beroep": (
+            "Vous n'êtes pas d'accord ? Parlez-en à votre formateur — il peut vérifier lui-même le "
+            "texte ci-dessus. Un texte invisible par accident ne compte pas comme de la triche."
+        ),
         "ocr_info": "Ce CV était un scan ou une image et n'a pas pu être lu directement. Le texte a été reconnu par IA (OCR) — l'analyse est normalement exploitable, mais peut être moins précise si le scan est flou.",
         # privacy
         "privacy_short": "🔒 **Votre CV n'est pas conservé.** Il n'y a ni base de données ni compte. Dès que vous fermez l'onglet, tout disparaît.",
@@ -233,13 +269,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "upload_error_type": "Le type de fichier '.{ext}' n'est pas pris en charge. Téléchargez un PDF, un fichier Word (.docx) ou un scan en JPG.",
         "upload_success": "Fichier chargé : **{name}** ({size:.2f} Mo)",
         "upload_filename_tip": "Conseil sur le nom du fichier : utilisez de préférence **Cv_Prénom Nom.pdf** (ex. Cv_Jana Claes.pdf). Vous pouvez aussi ajouter 'étudiant' et la fonction visée : Cv_Jana Claes étudiant Accueil.pdf",
+        "upload_filename_ok": "Le nom du fichier suit la forme recommandée **Cv_Prénom Nom** — parfait. L'employeur voit tout de suite à qui appartient le CV.",
         # results
         "results_header": "## Résultats de l'analyse de votre CV",
         "results_summary": "**Résumé**",
         "results_cat_scores": "### Score par catégorie",
         "results_strengths": "### Ce que vous faites déjà bien",
         "results_improvements": "### Comment améliorer votre CV",
-        "results_improvements_caption": "{n} point{p} d'amélioration, du plus au moins impactant",
+        "results_improvements_caption": "{n} point{p} d'amélioration, dans l'ordre du CV : de haut en bas",
         "results_improvements_plural": "s",
         "results_what_missing": "**Ce qui manque :**",
         "results_why_important": "**Pourquoi c'est important :**",
@@ -263,12 +300,15 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "checklist_partial": "Partiellement présent",
         "checklist_not_met": "Absent",
         "checklist_points": "points",
-        "checklist_manual": "à vérifier visuellement soi-même",
+        "checklist_manual": "nous ne pouvons pas le vérifier automatiquement, vérifiez-le vous-même",
+        "checklist_manual_status": "À vérifier vous-même",
         # address check
         "results_adres_header": "### Vérification de l'adresse",
         "adres_none": "Aucune adresse n'a été trouvée dans le CV.",
         "adres_ok": "L'adresse ({adres}) est écrite dans la même langue que le CV. ✓",
         "adres_mismatch": "Attention : l'adresse ({adres}) ne semble pas être écrite dans la même langue que le reste du CV.",
+        "adres_gemeente": "Attention : l'adresse ({adres}) ne mentionne pas de commune, ou indique la région à la place. Les employeurs veulent voir la commune.",
+        "adres_suggestie": "Voici comment l'adresse devrait s'écrire :",
         # score labels
         "score_needs_work": "À améliorer",
         "score_sufficient": "Suffisant",
@@ -293,7 +333,13 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "cv_lang_fr": "Français",
         "cv_lang_en": "Anglais",
         # criteria editor
-        "criteria_expander": "🛠️ Modifier les critères ou ajouter vos propres critères (pour les formateurs)",
+        "criteria_expander": "📋 Consulter les critères d'évaluation",
+        "criteria_readonly_caption": "Voici tous les critères sur lesquels votre CV est évalué. Vous pouvez les lire ; seul le formateur peut les modifier.",
+        "criteria_locked_note": "Les critères sont fixes pour cet atelier.",
+        "criteria_code_label": "Code formateur",
+        "criteria_code_btn": "Déverrouiller",
+        "criteria_code_fout": "Ce code n'est pas correct.",
+        "criteria_lock": "🔒 Verrouiller à nouveau",
         "criteria_caption": (
             "Vous pouvez activer ou désactiver des critères, modifier les descriptions et ajouter "
             "vos propres critères par catégorie pour cette session. "
@@ -336,6 +382,19 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "error_unexpected": "An unexpected error occurred: {error}",
         "footer": "Gluon Educatie — CV Analyser v1.0 | Data is not stored",
         "partners_support": "The workshop tools of Gluon Educatie were developed with the support of Jump naar Werk and Tracé Brussel.",
+        # prompt injection
+        "injectie_header": "Score set to 0 — hidden instructions found in this CV",
+        "injectie_uitleg": (
+            "This CV contains text that is **invisible** on the page and tries to steer the "
+            "assessment. That is cheating: misleading an employer or a recruitment system counts "
+            "as fraud, which is why the score is **0/100**. The feedback below is kept, so you can "
+            "still see what else is right about your CV."
+        ),
+        "injectie_bewijs": "**This is the text that was found:**",
+        "injectie_beroep": (
+            "Do you disagree? Talk to your trainer — they can check the text above themselves. "
+            "Text that became invisible by accident does not count as cheating."
+        ),
         "ocr_info": "This CV was a scan or an image and could not be read directly. The text was recognised using AI (OCR) — the analysis is normally usable, but may be less accurate if the scan is blurry.",
         # privacy
         "privacy_short": "🔒 **Your CV is not stored.** There is no database and no account. As soon as you close the tab, everything is gone.",
@@ -387,13 +446,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "upload_error_type": "File type '.{ext}' is not supported. Upload a PDF, a Word file (.docx) or a scan in JPG.",
         "upload_success": "File loaded: **{name}** ({size:.2f} MB)",
         "upload_filename_tip": "File name tip: preferably use **Cv_FirstName LastName.pdf** (e.g. Cv_Jana Claes.pdf). You can also add 'student' and the job function: Cv_Jana Claes student Reception.pdf",
+        "upload_filename_ok": "The file name follows the recommended form **Cv_FirstName LastName** — nicely done. An employer sees straight away whose CV it is.",
         # results
         "results_header": "## Results of your CV analysis",
         "results_summary": "**Summary**",
         "results_cat_scores": "### Score per category",
         "results_strengths": "### What you're already doing well",
         "results_improvements": "### How to improve your CV",
-        "results_improvements_caption": "{n} improvement point{p}, from most to least impactful",
+        "results_improvements_caption": "{n} improvement point{p}, in the order they appear on your CV: top to bottom",
         "results_improvements_plural": "s",
         "results_what_missing": "**What is missing:**",
         "results_why_important": "**Why this matters:**",
@@ -417,12 +477,15 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "checklist_partial": "Partially present",
         "checklist_not_met": "Not present",
         "checklist_points": "points",
-        "checklist_manual": "check visually yourself",
+        "checklist_manual": "we cannot check this automatically, please check it yourself",
+        "checklist_manual_status": "Check yourself",
         # address check
         "results_adres_header": "### Address check",
         "adres_none": "No address was found in the CV.",
         "adres_ok": "The address ({adres}) is written in the same language as the CV. ✓",
         "adres_mismatch": "Note: the address ({adres}) does not appear to be written in the same language as the rest of the CV.",
+        "adres_gemeente": "Note: the address ({adres}) does not name a municipality, or names the region instead. Employers want to see the municipality.",
+        "adres_suggestie": "This is how the address should look:",
         # score labels
         "score_needs_work": "Needs work",
         "score_sufficient": "Sufficient",
@@ -447,7 +510,13 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "cv_lang_fr": "French",
         "cv_lang_en": "English",
         # criteria editor
-        "criteria_expander": "🛠️ Adjust criteria or add your own criteria (for trainers)",
+        "criteria_expander": "📋 View the assessment criteria",
+        "criteria_readonly_caption": "These are all the criteria your CV is assessed on. You can read them here; only the trainer can change them.",
+        "criteria_locked_note": "The criteria are fixed for this workshop.",
+        "criteria_code_label": "Trainer code",
+        "criteria_code_btn": "Unlock",
+        "criteria_code_fout": "That code is not correct.",
+        "criteria_lock": "🔒 Lock again",
         "criteria_caption": (
             "You can enable or disable criteria, edit descriptions and add your own criteria "
             "per category for this session. "

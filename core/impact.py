@@ -28,7 +28,9 @@ Redenering:
    We rekenen met 200 g/kWh.
 
 Bij een gescand CV (PDF-scan of JPG) komt er tekstherkenning bij: dat is een
-extra oproep met een afbeelding, goed voor ongeveer een verdubbeling.
+extra oproep met een afbeelding, goed voor ongeveer een verdubbeling. Staat er
+een pasfoto in de PDF, dan komt daar nog een kleine beeldoproep bij; die is
+klein genoeg om binnen de marge van deze schatting te vallen.
 """
 
 # ── Aannames (pas hier aan als er betere cijfers beschikbaar zijn) ───────────

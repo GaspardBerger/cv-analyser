@@ -7,7 +7,9 @@ An AI-powered resume analysis tool built with Streamlit and Claude. Upload a CV 
 - **Multi-format upload** — accepts PDF, DOCX and JPG (a scan of a paper CV; JPGs are read with Claude Vision OCR)
 - **AI analysis** — uses Claude to evaluate CVs against a configurable set of criteria
 - **Checklist-based criteria** — the criteria in `config/criteria.yaml` mirror the paper CV checklist (layout + content) that students complete manually first; a CV that meets the full checklist scores 100/100
-- **Customizable criteria** — trainers can toggle, edit and add their own criteria directly in the UI for the current session
+- **Locked criteria** — participants can read every criterion but not change it. Trainers unlock editing (toggle, edit, add criteria) with a code set as `TRAINER_CODE` in the app secrets; with no code configured the panel stays read-only for everyone
+- **Anti-cheating** — text hidden on the page (white-on-white or a sub-3pt font) is extracted and checked for prompt injection. A deliberate attempt to steer the assessment scores 0/100 with the evidence shown; accidentally invisible text is explicitly not penalised
+- **Technical measurements instead of guesses** — page count, font sizes, font families and left-margin alignment are measured from the PDF, and an embedded portrait photo is assessed with Claude Vision, so the layout criteria are judged on data rather than inference
 - **Annotated CV preview** — results are shown in two columns: numbered improvement points on the left, and the CV on the right with the corresponding problem areas marked by dashed boxes (PDF pages rendered via PyMuPDF; text-based preview for Word files)
 - **Deterministic, transparent scoring** — the AI only judges each criterion as met / partially met / not met; the score itself is computed in Python from the fixed weights in `criteria.yaml`. Every assessed criterion is shown in the results (no hidden criteria), so improving a criterion and re-uploading always raises the score
 - **Stable re-uploads** — results are cached in memory (2h) on the extracted text, criteria and language, so re-uploading an unchanged CV returns the exact same score and remarks
@@ -35,7 +37,8 @@ cv-analyser/
 │   ├── analyzer.py         # Claude API integration
 │   ├── extractor.py        # Document text extraction (PDF, DOCX, JPG via OCR)
 │   ├── impact.py           # Energy/CO2 estimate per analysis
-│   ├── preview.py          # PDF metadata + annotated CV preview
+│   ├── inspectie.py        # PDF measurements, hidden text, photo assessment
+│   ├── preview.py          # Ordering + annotated CV preview
 │   └── privacy.py          # Temporary file handling
 └── ui/
     ├── upload.py           # File upload component
