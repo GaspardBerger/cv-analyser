@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """CV-Analysator — Gluon Educatie. Streamlit hoofdapplicatie."""
 
+import base64
 import json
 import os
 import sys
+from pathlib import Path
 
 import streamlit as st
 
@@ -103,6 +105,55 @@ def _nieuwe_analyse():
     st.rerun()
 
 
+ASSETS_MAP = Path(__file__).parent / "assets"
+
+# Hoogte in pixels per logo — per logo apart zodat ze optisch even groot ogen
+# (de beeldverhoudingen verschillen sterk).
+LOGO_HOOGTES = {
+    "logo_gluon_education.png": 46,
+    "logo_trace_brussel.png": 34,
+    "logo_jump_naar_werk.png": 44,
+}
+
+
+@st.cache_data(show_spinner=False)
+def _logo_data_uri(bestandsnaam: str) -> str:
+    """Lees een logo in als data-URI, zodat het zonder extra verzoek meelaadt."""
+    data = base64.standard_b64encode((ASSETS_MAP / bestandsnaam).read_bytes()).decode()
+    return f"data:image/png;base64,{data}"
+
+
+def _toon_partners():
+    """Steunvermelding met de logo's, gecentreerd onderaan de pagina.
+
+    De logo's staan op een wit vlak: het GLUON-logo is zwart en het logo van
+    Jump naar Werk heeft een witte achtergrond, dus op een donker thema zouden
+    ze anders wegvallen of als een wit blok verschijnen.
+    """
+    try:
+        afbeeldingen = "".join(
+            f'<img src="{_logo_data_uri(naam)}" alt="" '
+            f'style="height:{hoogte}px;width:auto;">'
+            for naam, hoogte in LOGO_HOOGTES.items()
+        )
+    except OSError:
+        return  # zonder logo's blijft de app gewoon bruikbaar
+
+    st.markdown(
+        f"""
+        <div style="background:#ffffff;border-radius:12px;padding:18px 16px 16px;
+                    margin-top:10px;text-align:center;">
+          <div style="font-size:13px;color:#555555;margin-bottom:16px;">
+            {t('partners_support')}
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;
+                      gap:36px;flex-wrap:wrap;">{afbeeldingen}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def _toon_voettekst():
     """Voettekst met de energie-inschatting; op elke pagina van de app."""
     st.divider()
@@ -122,6 +173,7 @@ def _toon_voettekst():
         ))
         st.caption(t("impact_note"))
     st.caption(t("footer"))
+    _toon_partners()
 
 
 # Header

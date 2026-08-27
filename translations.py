@@ -27,6 +27,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "Er is een onverwachte fout opgetreden: {error}",
         "footer": "Gluon Educatie — CV-Analysator v1.0 | Gegevens worden niet opgeslagen",
+        "partners_support": "De workshoptools van Gluon Educatie zijn ontwikkeld met de steun van Jump naar Werk en Tracé Brussel.",
         "ocr_info": "Dit CV was een scan of afbeelding en kon niet rechtstreeks worden uitgelezen. De tekst werd herkend via AI (OCR) — de analyse is normaal bruikbaar, maar kan minder nauwkeurig zijn bij een onscherpe scan.",
         # privacy
         "privacy_short": "🔒 **Je CV wordt niet bewaard.** Er is geen database en geen account. Zodra je het tabblad sluit, is alles weg.",
@@ -180,6 +181,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "Une erreur inattendue s'est produite : {error}",
         "footer": "Gluon Educatie — Analyseur de CV v1.0 | Les données ne sont pas conservées",
+        "partners_support": "Les outils d'atelier de Gluon Educatie ont été développés avec le soutien de Jump naar Werk et Tracé Brussel.",
         "ocr_info": "Ce CV était un scan ou une image et n'a pas pu être lu directement. Le texte a été reconnu par IA (OCR) — l'analyse est normalement exploitable, mais peut être moins précise si le scan est flou.",
         # privacy
         "privacy_short": "🔒 **Votre CV n'est pas conservé.** Il n'y a ni base de données ni compte. Dès que vous fermez l'onglet, tout disparaît.",
@@ -333,6 +335,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         ),
         "error_unexpected": "An unexpected error occurred: {error}",
         "footer": "Gluon Educatie — CV Analyser v1.0 | Data is not stored",
+        "partners_support": "The workshop tools of Gluon Educatie were developed with the support of Jump naar Werk and Tracé Brussel.",
         "ocr_info": "This CV was a scan or an image and could not be read directly. The text was recognised using AI (OCR) — the analysis is normally usable, but may be less accurate if the scan is blurry.",
         # privacy
         "privacy_short": "🔒 **Your CV is not stored.** There is no database and no account. As soon as you close the tab, everything is gone.",
