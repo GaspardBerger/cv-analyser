@@ -249,7 +249,6 @@ def beoordeel_foto(foto_bytes: bytes) -> dict:
         bericht = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=400,
-            temperature=0.0,
             messages=[{
                 "role": "user",
                 "content": [

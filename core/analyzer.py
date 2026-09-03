@@ -312,10 +312,16 @@ def analyseer_cv(
 
     client = anthropic.Anthropic(api_key=api_sleutel)
 
+    # Let op: geef hier GEEN temperature mee. De sampling-parameters
+    # (temperature/top_p/top_k) zijn verwijderd uit de Claude API en uit de
+    # nieuwere anthropic-SDK; meegeven levert een TypeError op. De consistentie
+    # van de score komt niet van temperature maar van: (1) de vaste instructie
+    # hieronder om elk criterium identiek te beoordelen, (2) de berekening van
+    # de score in Python, en (3) de cache in app.py, waardoor een ongewijzigd
+    # CV exact hetzelfde rapport teruggeeft.
     bericht = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=8192,
-        temperature=0.0,
         system=system_prompt,
         messages=[
             {
