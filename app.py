@@ -26,7 +26,7 @@ except Exception:
 # Zorg dat de projectmap in het Python-pad zit
 sys.path.insert(0, os.path.dirname(__file__))
 
-from core.analyzer import analyseer_cv
+from core.analyzer import analyseer_cv, classificeer_fout
 from core.extractor import extraheer_tekst
 from core.impact import nl_getal, schatting
 from core.inspectie import (
@@ -287,11 +287,11 @@ if bestand is not None:
                 st.error(str(fout))
                 st.stop()
             except Exception as fout:
-                fout_str = str(fout).lower()
-                if "connection" in fout_str or "network" in fout_str or "timeout" in fout_str:
-                    st.error(t("error_no_connection"))
-                else:
-                    st.error(t("error_unexpected", error=fout))
+                # Een deelnemer krijgt een begrijpelijke melding; de technische
+                # details staan eronder ingeklapt voor de begeleider.
+                st.error(t(f"error_{classificeer_fout(fout)}"))
+                with st.expander(t("error_details"), expanded=False):
+                    st.code(str(fout), language=None)
                 st.stop()
 
         st.session_state.analyse_resultaat = resultaat

@@ -153,6 +153,42 @@ VERPLICHT OUTPUT FORMAT — geef ENKEL dit JSON-object terug, zonder markdown, z
 }}"""
 
 
+def classificeer_fout(fout: Exception) -> str:
+    """Bepaal wat er misging bij een API-aanroep.
+
+    Geeft een sleutel terug die de UI vertaalt naar een begrijpelijke melding:
+    credit, auth, rate_limit, overloaded, connection of unexpected.
+    Zo krijgt een deelnemer nooit een ruwe technische foutmelding te zien.
+    """
+    try:
+        import anthropic
+    except ImportError:
+        return "unexpected"
+
+    # Volgorde is belangrijk: de specifieke fouten zijn subklassen van
+    # APIStatusError, dus die moeten eerst gecontroleerd worden.
+    if isinstance(fout, anthropic.APIConnectionError):
+        return "connection"
+    if isinstance(fout, (anthropic.AuthenticationError, anthropic.PermissionDeniedError)):
+        return "auth"
+    if isinstance(fout, anthropic.RateLimitError):
+        return "rate_limit"
+    if isinstance(fout, anthropic.BadRequestError):
+        # Een opgebruikt tegoed komt terug als 400 invalid_request_error
+        return "credit" if "credit balance" in str(fout).lower() else "unexpected"
+    if isinstance(fout, anthropic.APIStatusError):
+        if getattr(fout, "status_code", 0) in (500, 502, 503, 529):
+            return "overloaded"
+        return "unexpected"
+
+    boodschap = str(fout).lower()
+    if "credit balance" in boodschap:
+        return "credit"
+    if any(w in boodschap for w in ("connection", "network", "timeout")):
+        return "connection"
+    return "unexpected"
+
+
 def _normaliseer_verdict(waarde) -> float:
     """Zet de score van de AI om naar exact 0, 0.5 of 1."""
     try:

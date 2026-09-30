@@ -25,7 +25,25 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "Geen verbinding met de analyseservice. "
             "Controleer je internetverbinding en probeer het opnieuw."
         ),
-        "error_unexpected": "Er is een onverwachte fout opgetreden: {error}",
+        "error_unexpected": "Er is een onverwachte fout opgetreden bij de analyse. Probeer het opnieuw; blijft het misgaan, verwittig dan je begeleider.",
+        "error_credit": (
+            "**De analyse kan nu niet uitgevoerd worden.** Het tegoed van de AI-service is op. "
+            "Verwittig je begeleider — die kan het tegoed aanvullen. Er is niets mis met jouw CV, "
+            "en er is niets bewaard. Probeer het straks opnieuw."
+        ),
+        "error_auth": (
+            "**De analyse-service is niet bereikbaar.** De toegangssleutel van de app werkt niet. "
+            "Dit moet de begeleider oplossen; het ligt niet aan jouw CV."
+        ),
+        "error_rate_limit": (
+            "**Even te druk.** Er worden op dit moment te veel CV's tegelijk geanalyseerd. "
+            "Wacht een halve minuut en klik dan opnieuw op 'CV analyseren'."
+        ),
+        "error_overloaded": (
+            "**De analyse-service is tijdelijk overbelast.** Dit ligt niet aan jouw CV. "
+            "Wacht even en probeer het opnieuw."
+        ),
+        "error_details": "Technische details (voor de begeleider)",
         "footer": "Gluon Educatie — CV-Analysator v1.0 | Gegevens worden niet opgeslagen",
         "partners_support": "De workshoptools van Gluon Educatie zijn ontwikkeld met de steun van Jump naar Werk en Tracé Brussel.",
         # prompt injection
@@ -202,7 +220,25 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "Impossible de se connecter au service d'analyse. "
             "Vérifiez votre connexion internet et réessayez."
         ),
-        "error_unexpected": "Une erreur inattendue s'est produite : {error}",
+        "error_unexpected": "Une erreur inattendue s'est produite pendant l'analyse. Réessayez ; si le problème persiste, prévenez votre formateur.",
+        "error_credit": (
+            "**L'analyse ne peut pas être effectuée pour le moment.** Le crédit du service d'IA est épuisé. "
+            "Prévenez votre formateur — il peut le recharger. Votre CV n'est pas en cause et rien n'a été conservé. "
+            "Réessayez plus tard."
+        ),
+        "error_auth": (
+            "**Le service d'analyse est inaccessible.** La clé d'accès de l'application ne fonctionne pas. "
+            "C'est au formateur de le résoudre ; cela ne vient pas de votre CV."
+        ),
+        "error_rate_limit": (
+            "**Trop de demandes en ce moment.** Trop de CV sont analysés en même temps. "
+            "Attendez une trentaine de secondes puis recliquez sur « Analyser le CV »."
+        ),
+        "error_overloaded": (
+            "**Le service d'analyse est temporairement surchargé.** Cela ne vient pas de votre CV. "
+            "Patientez un instant et réessayez."
+        ),
+        "error_details": "Détails techniques (pour le formateur)",
         "footer": "Gluon Educatie — Analyseur de CV v1.0 | Les données ne sont pas conservées",
         "partners_support": "Les outils d'atelier de Gluon Educatie ont été développés avec le soutien de Jump naar Werk et Tracé Brussel.",
         # prompt injection
@@ -379,7 +415,25 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "Unable to connect to the analysis service. "
             "Check your internet connection and try again."
         ),
-        "error_unexpected": "An unexpected error occurred: {error}",
+        "error_unexpected": "An unexpected error occurred during the analysis. Try again; if it keeps failing, tell your trainer.",
+        "error_credit": (
+            "**The analysis cannot run right now.** The AI service has run out of credit. "
+            "Tell your trainer — they can top it up. There is nothing wrong with your CV, "
+            "and nothing has been stored. Try again later."
+        ),
+        "error_auth": (
+            "**The analysis service cannot be reached.** The app's access key is not working. "
+            "Your trainer needs to fix this; it is not caused by your CV."
+        ),
+        "error_rate_limit": (
+            "**Too busy right now.** Too many CVs are being analysed at the same time. "
+            "Wait about half a minute and click 'Analyse CV' again."
+        ),
+        "error_overloaded": (
+            "**The analysis service is temporarily overloaded.** This is not caused by your CV. "
+            "Wait a moment and try again."
+        ),
+        "error_details": "Technical details (for the trainer)",
         "footer": "Gluon Educatie — CV Analyser v1.0 | Data is not stored",
         "partners_support": "The workshop tools of Gluon Educatie were developed with the support of Jump naar Werk and Tracé Brussel.",
         # prompt injection

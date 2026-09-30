@@ -233,11 +233,21 @@ def _extraheer_afbeelding(pad: str) -> tuple[str, str | None]:
             }],
         )
         tekst = bericht.content[0].text.strip()
-    except Exception:
-        return "", (
-            "De tekstherkenning is mislukt. Controleer je internetverbinding "
-            "en probeer het opnieuw."
-        )
+    except Exception as fout:
+        from core.analyzer import classificeer_fout
+
+        code = classificeer_fout(fout)
+        if code in ("credit", "auth"):
+            return "", (
+                "De tekstherkenning kan nu niet uitgevoerd worden omdat de AI-service "
+                "niet beschikbaar is. Verwittig je begeleider — het ligt niet aan je bestand."
+            )
+        if code == "connection":
+            return "", (
+                "De tekstherkenning is mislukt. Controleer je internetverbinding "
+                "en probeer het opnieuw."
+            )
+        return "", "De tekstherkenning is mislukt. Probeer het opnieuw."
 
     if not tekst or len(tekst) < 50:
         return "", (
