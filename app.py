@@ -23,6 +23,13 @@ try:
 except Exception:
     pass
 
+# Een sleutel die geplakt is, sleept vaak een spatie, aanhalingsteken of
+# regeleinde mee. Dat levert een 401 op die eruitziet als een ongeldige
+# sleutel, dus poetsen we hem hier één keer op voor de hele app.
+_sleutel = os.environ.get("ANTHROPIC_API_KEY", "")
+if _sleutel:
+    os.environ["ANTHROPIC_API_KEY"] = _sleutel.strip().strip('"').strip("'").strip()
+
 # Zorg dat de projectmap in het Python-pad zit
 sys.path.insert(0, os.path.dirname(__file__))
 
