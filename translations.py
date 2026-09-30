@@ -44,6 +44,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "Wacht even en probeer het opnieuw."
         ),
         "error_details": "Technische details (voor de begeleider)",
+        "error_diagnose_header": "**Automatische controle van sleutel en tegoed**",
         "footer": "Gluon Educatie — CV-Analysator v1.0 | Gegevens worden niet opgeslagen",
         "partners_support": "De workshoptools van Gluon Educatie zijn ontwikkeld met de steun van Jump naar Werk en Tracé Brussel.",
         # prompt injection
@@ -239,6 +240,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "Patientez un instant et réessayez."
         ),
         "error_details": "Détails techniques (pour le formateur)",
+        "error_diagnose_header": "**Vérification automatique de la clé et du crédit**",
         "footer": "Gluon Educatie — Analyseur de CV v1.0 | Les données ne sont pas conservées",
         "partners_support": "Les outils d'atelier de Gluon Educatie ont été développés avec le soutien de Jump naar Werk et Tracé Brussel.",
         # prompt injection
@@ -434,6 +436,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "Wait a moment and try again."
         ),
         "error_details": "Technical details (for the trainer)",
+        "error_diagnose_header": "**Automatic check of key and credit**",
         "footer": "Gluon Educatie — CV Analyser v1.0 | Data is not stored",
         "partners_support": "The workshop tools of Gluon Educatie were developed with the support of Jump naar Werk and Tracé Brussel.",
         # prompt injection

@@ -27,6 +27,7 @@ except Exception:
 sys.path.insert(0, os.path.dirname(__file__))
 
 from core.analyzer import analyseer_cv, classificeer_fout
+from core.diagnose import diagnose_api
 from core.extractor import extraheer_tekst
 from core.impact import nl_getal, schatting
 from core.inspectie import (
@@ -289,8 +290,16 @@ if bestand is not None:
             except Exception as fout:
                 # Een deelnemer krijgt een begrijpelijke melding; de technische
                 # details staan eronder ingeklapt voor de begeleider.
-                st.error(t(f"error_{classificeer_fout(fout)}"))
+                code = classificeer_fout(fout)
+                st.error(t(f"error_{code}"))
                 with st.expander(t("error_details"), expanded=False):
+                    # Bij een tegoed- of toegangsfout meteen uitzoeken of het
+                    # aan de sleutel ligt of aan het tegoed van die organisatie
+                    if code in ("credit", "auth"):
+                        st.markdown(t("error_diagnose_header"))
+                        for regel in diagnose_api():
+                            st.markdown(regel)
+                        st.markdown("---")
                     st.code(str(fout), language=None)
                 st.stop()
 
